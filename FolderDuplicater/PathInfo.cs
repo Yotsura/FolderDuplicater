@@ -35,7 +35,7 @@ namespace FolderDuplicater
                 {
                     case ConsoleKey.Y: return;
                     case ConsoleKey.N: break;
-                    default:return;
+                    default: break;
                 }
             }
 
