@@ -13,7 +13,6 @@ namespace FolderDuplicater
         string _origFolderPath { get; set; }
         string _destinationFolderPath { get; set; }
 
-
         public Duplicater(PathInfo pathinfo)
         {
             _origFolderPath = pathinfo.OrigPath;
@@ -39,20 +38,13 @@ namespace FolderDuplicater
 
         public void Dupticate()
         {
-            Console.WriteLine("\r\n新しい更新のファイルのみ対象で構いませんか？\r\n(Nで全ファイル確認します。)\r\nY/N");
-            var allcheck = Console.ReadKey().Key == ConsoleKey.N;
-            Console.WriteLine();
-            var cnt = 1;
-            var newcnt = 0;
-            var updcnt = 0;
             var top = Console.CursorTop;
             var left = Console.CursorLeft;
-            foreach (var file in _origData)
+            Console.WriteLine($"\r\n<複製中>");
+            var newcnt = 0;
+            var updcnt = 0;
+            _origData.AsParallel().ForAll(file =>
             {
-                Console.WriteLine($"<複製中>\r\n{cnt++}/{_origData.Count()}：{file.FullName}{_spacor}");
-                Console.SetCursorPosition(left, top);
-
-                //System.Threading.Thread.Sleep(1000);
                 var targetFolderPath = CreateDesinationPath(file.Directory.ToString());
                 if (!Directory.Exists(targetFolderPath))
                     Directory.CreateDirectory(targetFolderPath);
@@ -60,40 +52,19 @@ namespace FolderDuplicater
                 if (File.Exists(destinationPath))
                 {
                     var destFile = new FileInfo(destinationPath);
-                    //Console.WriteLine($"{file.Name}");
-                    //Console.WriteLine($"{file.CreationTimeUtc}ー{destFile.CreationTimeUtc}");
-                    //Console.WriteLine($"{file.LastWriteTimeUtc}ー{destFile.LastWriteTimeUtc}");
-
-                    //if (destFile.LastWriteTimeUtc >= file.LastWriteTimeUtc) continue;
-                    if (destFile.LastWriteTimeUtc >= file.LastWriteTimeUtc)
-                        if (allcheck) continue;
-                        else break;
+                    if (destFile.LastWriteTimeUtc >= file.LastWriteTimeUtc) return;
                     updcnt++;
                 }
                 File.Copy(file.FullName, destinationPath, true);
                 newcnt++;
-            }
-            Console.WriteLine(_spacor);
+            });
             Console.SetCursorPosition(left, top);
-            Console.WriteLine($"<複製完了>\r\n{_origData.Count()}件の内、\r\n更新ファイル{updcnt}件、\r\n新規ファイル{newcnt - updcnt}件");
+            Console.WriteLine($"\r\n<複製完了>\r\n{_origData.Count()}件の内、\r\n更新ファイル{updcnt}件、\r\n新規ファイル{newcnt - updcnt}件");
         }
 
         string CreateDesinationPath(string origfilepath)
         {
             return origfilepath.Replace(_origFolderPath, _destinationFolderPath);
         }
-
-        const string _spacor
-            = "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"
-            + "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　";
     }
 }

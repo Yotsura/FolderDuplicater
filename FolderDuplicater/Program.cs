@@ -11,8 +11,8 @@ namespace FolderDuplicater
         static void Main(string[] args)
         {
             var test = new Duplicater(new PathInfo());
-            //Console.WriteLine("作業を開始するにはEnterを押してください。");
-            //if (Console.ReadKey().Key != ConsoleKey.Enter) return;
+            Console.WriteLine("作業を開始するにはEnterを押してください。");
+            if (Console.ReadKey().Key != ConsoleKey.Enter) return;
             test.Dupticate();
             Console.ReadKey();
         }
