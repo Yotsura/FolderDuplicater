@@ -48,8 +48,18 @@ namespace FolderDuplicater
             if (File.Exists(DestInfo.FullName))
                 File.Delete(DestInfo.FullName);
             //フォルダが殻になった場合は自身を削除
-            if (!Directory.EnumerateFileSystemEntries(DestInfo.DirectoryName, "*", System.IO.SearchOption.AllDirectories).Any())
-                Directory.Delete(DestInfo.DirectoryName, false);
+
+            DelDir(DestInfo.DirectoryName);
+        }
+
+        void DelDir(string dir)
+        {
+            if (!Directory.EnumerateFileSystemEntries(dir, "*", System.IO.SearchOption.AllDirectories).Any())
+            {
+                Directory.Delete(dir, false);
+                DelDir(new DirectoryInfo(dir).Parent.FullName);
+            }
+            return;
         }
     }
 }
