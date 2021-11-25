@@ -12,11 +12,12 @@ namespace FolderDuplicater
         List<FileData> _allfiles { get; set; }
         string _origFolderPath { get; set; }
         string _destinationFolderPath { get; set; }
+        bool IsMirroring { get; set; }
 
-        public Duplicater(PathInfo pathinfo)
+        public Duplicater((string origPath,string destPath)target)
         {
-            _origFolderPath = pathinfo.OrigPath;
-            _destinationFolderPath = pathinfo.DestinationPath;
+            _origFolderPath = target.origPath;
+            _destinationFolderPath = target.destPath;
             if (!Directory.Exists(_origFolderPath))
             {
                 Console.WriteLine("複製元フォルダーが存在しません。");
@@ -27,6 +28,7 @@ namespace FolderDuplicater
                 Console.WriteLine("複製先フォルダーが存在しません。");
                 return;
             }
+            Console.WriteLine($"複製元のフォルダーのパス：{target.origPath}\r\n複製先のフォルダーのパス：{target.destPath}\r\n");
 
             Console.WriteLine($"\r\n更新対象のリストアップ中...");
             var checkList = Directory.EnumerateFiles(_origFolderPath, "*", System.IO.SearchOption.AllDirectories);
@@ -38,9 +40,9 @@ namespace FolderDuplicater
             _allfiles = checkList
                 .Select(file =>
                 {
-                    var temp = new FileData(pathinfo, file);
-
-                    var per = (double)cnt++ / (double)checkListCnt;
+                    cnt++;
+                    var temp = new FileData(target, file);
+                    var per = (double)cnt / (double)checkListCnt;
                     Console.SetCursorPosition(0, Console.CursorTop);
                     Console.Write(($"{GetProgressBar(20, per)}{cnt}/{checkListCnt}").PadRight(prePos));
 
@@ -54,6 +56,8 @@ namespace FolderDuplicater
             var updatedfilecnt = _allfiles.Count(x => x.IsUpdatedFile);
             Console.WriteLine($"\r\n更新対象は全{_allfiles.Count}件です。");
             Console.WriteLine($"更新ファイル：{updatedfilecnt}件\r\n新規ファイル：{newfilecnt}件");
+
+            if (_allfiles.Count > 0) Duplicate();
         }
 
         string GetProgressBar(int barLength, double per)
@@ -62,7 +66,7 @@ namespace FolderDuplicater
             return $"【{new string('■', bar)}{new string('□', barLength - bar)}】";
         }
 
-        public void Dupticate()
+        void Duplicate()
         {
             var top = Console.CursorTop;
             var left = Console.CursorLeft;

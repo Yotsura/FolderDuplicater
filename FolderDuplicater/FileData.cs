@@ -14,11 +14,11 @@ namespace FolderDuplicater
         public FileInfo OrigInfo { get; set; }
         public string DestinationFolderPath { get; set; }
         public string DestinationFilePath { get; set; }
-        public FileData(PathInfo path, string filepath)
+        public FileData((string origPath, string destPath) target, string filepath)
         {
             OrigInfo = new FileInfo(filepath);
-            DestinationFolderPath = OrigInfo.DirectoryName.Replace(path.OrigPath, path.DestinationPath);
-            DestinationFilePath = OrigInfo.FullName.Replace(path.OrigPath, path.DestinationPath);
+            DestinationFolderPath = OrigInfo.DirectoryName.Replace(target.origPath, target.destPath);
+            DestinationFilePath = OrigInfo.FullName.Replace(target.origPath, target.destPath);
 
             if (!File.Exists(DestinationFilePath)) return;
             IsNewFile = false;

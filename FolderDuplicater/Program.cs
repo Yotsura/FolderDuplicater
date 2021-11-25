@@ -17,10 +17,18 @@ namespace FolderDuplicater
                 Console.ReadKey();
                 return;
             }
-            var duplicater = new Duplicater(new PathInfo());
+            Console.Clear();
+            Console.WriteLine("***********************************************************");
+            foreach (var (Orig, Dest) in targetsInfo.PathPairs)
+                Console.WriteLine($"複製元のフォルダーのパス：{Orig}\r\n複製先のフォルダーのパス：{Dest}\r\n");
+            Console.WriteLine("***********************************************************");
             Console.WriteLine("作業を開始するにはEnterを押してください。");
             if (Console.ReadKey().Key != ConsoleKey.Enter) return;
-            duplicater.Dupticate();
+            Console.Clear();
+            foreach (var target in targetsInfo.PathPairs)
+                new Duplicater(target);
+
+            Console.WriteLine("\r\n＜作業完了＞\r\nプログラムを終了します。\r\npress any key...");
             Console.ReadKey();
         }
     }

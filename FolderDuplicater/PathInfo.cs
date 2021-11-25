@@ -9,16 +9,14 @@ namespace FolderDuplicater
     class PathInfo
     {
         public List<(string Orig, string Dest)> PathPairs { get; set; }
-        public string OrigPath { get; set; }
-        public string DestinationPath { get; set; }
         public PathInfo()
         {
             PathPairs = Settings.Default.PathPairs;
             if (PathPairs.Count() > 0)
             {
                 Console.WriteLine("***********************************************************");
-                foreach (var pair in PathPairs)
-                    Console.WriteLine($"複製元のフォルダーのパス：{pair.Orig}\r\n複製先のフォルダーのパス：{pair.Dest}\r\n");
+                foreach (var (Orig, Dest) in PathPairs)
+                    Console.WriteLine($"複製元のフォルダーのパス：{Orig}\r\n複製先のフォルダーのパス：{Dest}\r\n");
                 Console.WriteLine("***********************************************************");
                 Console.WriteLine("このまま実行しますか？　Y/N");
                 switch (Console.ReadKey().Key)
@@ -34,8 +32,8 @@ namespace FolderDuplicater
             {
                 Console.Clear();
                 Console.WriteLine("***********************************************************");
-                foreach (var pair in PathPairs)
-                    Console.WriteLine($"複製元のフォルダーのパス：{pair.Orig}\r\n複製先のフォルダーのパス：{pair.Dest}\r\n");
+                foreach (var (Orig, Dest) in PathPairs)
+                    Console.WriteLine($"複製元のフォルダーのパス：{Orig}\r\n複製先のフォルダーのパス：{Dest}\r\n");
                 Console.WriteLine("***********************************************************");
                 Console.WriteLine("設定変更内容を選択してください。\r\n1:設定追加\r\n2:設定の一部削除\r\n3:設定をクリアして追加\r\n" +
                     "Esc:更新画面を閉じる\r\nEnter:設定変更を保存");
@@ -51,7 +49,7 @@ namespace FolderDuplicater
                         break;
                     case ConsoleKey.D3:
                     case ConsoleKey.NumPad3:
-                        Settings.Default.PathPairs = new List<(string Orig, string Dest)>();
+                        PathPairs = new List<(string Orig, string Dest)>();
                         AddSettings();
                         break;
                     case ConsoleKey.Escape:
@@ -68,11 +66,6 @@ namespace FolderDuplicater
 
         void DeleteSettings()
         {
-            SelectSettingIdx();
-        }
-
-        void SelectSettingIdx()
-        {
             var temp = PathPairs.Select(x => x).ToList();
             var idx = 0;
             for (; ; )
@@ -81,9 +74,9 @@ namespace FolderDuplicater
                 Console.WriteLine("***********************************************************");
                 for (var i = 0; i < temp.Count(); i++)
                 {
-                    var pair = temp[i];
+                    var (Orig, Dest) = temp[i];
                     Console.WriteLine($"設定:{i}{(idx == i ? "＜【削除】" : "")}\r\n" +
-                        $"複製元のフォルダーのパス：{pair.Orig}\r\n複製先のフォルダーのパス：{pair.Dest}\r\n");
+                        $"複製元のフォルダーのパス：{Orig}\r\n複製先のフォルダーのパス：{Dest}\r\n");
                 }
                 Console.WriteLine("***********************************************************");
                 Console.WriteLine("削除する設定を↑↓で選択し、Deleteを押してください。\r\nEnter:設定を保存/Esc:元の画面に戻る。");
@@ -100,15 +93,15 @@ namespace FolderDuplicater
                         break;
                     case ConsoleKey.Delete:
                         temp.RemoveAt(idx);
+                        if (idx > temp.Count - 1) idx = temp.Count() - 1;
                         continue;
                     case ConsoleKey.Escape:
-                        Console.Clear();
                         return;
                     case ConsoleKey.Enter:
                         PathPairs = temp;
                         Settings.Default.PathPairs = PathPairs;
                         Settings.Default.Save();
-                        return;
+                        continue;
                     default: break;
                 }
             }
@@ -118,7 +111,8 @@ namespace FolderDuplicater
         {
             for (; ; )
             {
-                Console.WriteLine("設定を追加します。\r\n複製元のフォルダーのパスを入力してください");
+                Console.Clear();
+                Console.WriteLine(("設定を追加します。\r\n複製元のフォルダーのパスを入力してください"));
                 var origPath = Console.ReadLine();
                 Console.WriteLine("複製先のフォルダーのパスを入力してください");
                 var destinationPath = Console.ReadLine();
@@ -135,7 +129,7 @@ namespace FolderDuplicater
                         break;
                     case ConsoleKey.N:
                     default:
-                        Console.WriteLine("\r\n設定を破棄しました。");
+                        Console.WriteLine("\r\n追加設定を破棄しました。");
                         break;
                 }
                 Console.WriteLine("続けて設定を追加しますか？　Y/N");
