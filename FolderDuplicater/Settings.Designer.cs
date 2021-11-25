@@ -12,7 +12,7 @@ namespace FolderDuplicater {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -44,6 +44,35 @@ namespace FolderDuplicater {
             }
             set {
                 this["DestinationPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string 設定 {
+            get {
+                return ((string)(this["設定"]));
+            }
+            set {
+                this["設定"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public System.Collections.Generic.List<(string Orig,string Dest)> PathPairs
+        {
+            get
+            {
+                return (this["PathPairs"] == null ?
+                    new System.Collections.Generic.List<(string Orig, string Dest)>() :
+                    (System.Collections.Generic.List<(string Orig, string Dest)>)(this["PathPairs"])
+                 );
+            }
+            set
+            {
+                this["PathPairs"] = value;
             }
         }
     }

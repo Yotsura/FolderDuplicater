@@ -8,29 +8,19 @@ namespace FolderDuplicater
 {
     class PathInfo
     {
+        public List<(string Orig, string Dest)> PathPairs { get; set; }
         public string OrigPath { get; set; }
         public string DestinationPath { get; set; }
         public PathInfo()
         {
-            SetPath();
-            SaveSettings();
-        }
-
-        void SaveSettings()
-        {
-            Settings.Default.OrigPath = OrigPath;
-            Settings.Default.DestinationPath = DestinationPath;
-            Settings.Default.Save();
-        }
-        void SetPath()
-        {
-            OrigPath = Settings.Default.OrigPath;
-            DestinationPath = Settings.Default.DestinationPath;
-            if (OrigPath != "" && DestinationPath != "")
+            PathPairs = Settings.Default.PathPairs;
+            if (PathPairs.Count() > 0)
             {
-                Console.WriteLine($"複製元のフォルダーのパス：{OrigPath}");
-                Console.WriteLine($"複製先のフォルダーのパス：{DestinationPath}");
-                Console.WriteLine("前回の設定を使用しますか？　Y/N");
+                Console.WriteLine("***********************************************************");
+                foreach (var pair in PathPairs)
+                    Console.WriteLine($"複製元のフォルダーのパス：{pair.Orig}\r\n複製先のフォルダーのパス：{pair.Dest}\r\n");
+                Console.WriteLine("***********************************************************");
+                Console.WriteLine("このまま実行しますか？　Y/N");
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.Y: return;
@@ -39,24 +29,118 @@ namespace FolderDuplicater
                 }
             }
 
+            //設定追加
             for (; ; )
             {
-                Console.WriteLine("複製元のフォルダーのパスを入力してください");
-                OrigPath = Console.ReadLine();
+                Console.Clear();
+                Console.WriteLine("***********************************************************");
+                foreach (var pair in PathPairs)
+                    Console.WriteLine($"複製元のフォルダーのパス：{pair.Orig}\r\n複製先のフォルダーのパス：{pair.Dest}\r\n");
+                Console.WriteLine("***********************************************************");
+                Console.WriteLine("設定変更内容を選択してください。\r\n1:設定追加\r\n2:設定の一部削除\r\n3:設定をクリアして追加\r\n" +
+                    "Esc:更新画面を閉じる\r\nEnter:設定変更を保存");
+                switch (Console.ReadKey().Key)
+                {
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        AddSettings();
+                        break;
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+                        DeleteSettings();
+                        break;
+                    case ConsoleKey.D3:
+                    case ConsoleKey.NumPad3:
+                        Settings.Default.PathPairs = new List<(string Orig, string Dest)>();
+                        AddSettings();
+                        break;
+                    case ConsoleKey.Escape:
+                        return;
+                    case ConsoleKey.Enter:
+                        Settings.Default.PathPairs = PathPairs;
+                        Settings.Default.Save();
+                        break;
+                    default: break;
+                }
+            }
+
+        }
+
+        void DeleteSettings()
+        {
+            SelectSettingIdx();
+        }
+
+        void SelectSettingIdx()
+        {
+            var temp = PathPairs.Select(x => x).ToList();
+            var idx = 0;
+            for (; ; )
+            {
+                Console.Clear();
+                Console.WriteLine("***********************************************************");
+                for (var i = 0; i < temp.Count(); i++)
+                {
+                    var pair = temp[i];
+                    Console.WriteLine($"設定:{i}{(idx == i ? "＜【削除】" : "")}\r\n" +
+                        $"複製元のフォルダーのパス：{pair.Orig}\r\n複製先のフォルダーのパス：{pair.Dest}\r\n");
+                }
+                Console.WriteLine("***********************************************************");
+                Console.WriteLine("削除する設定を↑↓で選択し、Deleteを押してください。\r\nEnter:設定を保存/Esc:元の画面に戻る。");
+
+                switch (Console.ReadKey().Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        idx--;
+                        if (idx < 0) idx = temp.Count() - 1;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        idx++;
+                        if (idx >= temp.Count()) idx = 0;
+                        break;
+                    case ConsoleKey.Delete:
+                        temp.RemoveAt(idx);
+                        continue;
+                    case ConsoleKey.Escape:
+                        Console.Clear();
+                        return;
+                    case ConsoleKey.Enter:
+                        PathPairs = temp;
+                        Settings.Default.PathPairs = PathPairs;
+                        Settings.Default.Save();
+                        return;
+                    default: break;
+                }
+            }
+        }
+
+        void AddSettings()
+        {
+            for (; ; )
+            {
+                Console.WriteLine("設定を追加します。\r\n複製元のフォルダーのパスを入力してください");
+                var origPath = Console.ReadLine();
                 Console.WriteLine("複製先のフォルダーのパスを入力してください");
-                DestinationPath = Console.ReadLine();
-                Console.WriteLine($"複製元のフォルダーのパス：{OrigPath}");
-                Console.WriteLine($"複製先のフォルダーのパス：{DestinationPath}");
-                Console.WriteLine("この設定で実行しますか？　Y/N");
+                var destinationPath = Console.ReadLine();
+
+                Console.WriteLine("***********************************************************");
+                Console.WriteLine($"複製元のフォルダーのパス：{origPath}\r\n複製先のフォルダーのパス：{destinationPath}\r\n");
+                Console.WriteLine("***********************************************************");
+
+                Console.WriteLine("この設定を追加しますか？　Y/N");
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.Y:
-                        return;
+                        PathPairs.Add((origPath, destinationPath));
+                        break;
                     case ConsoleKey.N:
                     default:
-                        Console.WriteLine("\r\n再設定します。");
+                        Console.WriteLine("\r\n設定を破棄しました。");
                         break;
                 }
+                Console.WriteLine("続けて設定を追加しますか？　Y/N");
+                if (Console.ReadKey().Key == ConsoleKey.Y) continue;
+                return;
             }
         }
     }
