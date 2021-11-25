@@ -19,6 +19,9 @@ namespace FolderDuplicater
             _origFolderPath = target.origPath;
             _destinationFolderPath = target.destPath;
             IsMirroring = isMirroring;
+            Console.WriteLine("***********************************************************");
+            Console.WriteLine($"複製元のフォルダーのパス：{_origFolderPath}\r\n複製先のフォルダーのパス：{_destinationFolderPath}\r\n");
+            Console.WriteLine("***********************************************************");
 
             if (!Directory.Exists(_origFolderPath))
             {
@@ -27,15 +30,13 @@ namespace FolderDuplicater
             }
             if (!Directory.Exists(_destinationFolderPath))
             {
-                Console.WriteLine("複製先フォルダーが存在しません。");
-                return;
+                Console.WriteLine("複製先フォルダーが存在しません。フォルダが新規作成されます。");
             }
-            Console.WriteLine("***********************************************************");
-            Console.WriteLine($"複製元のフォルダーのパス：{_origFolderPath}\r\n複製先のフォルダーのパス：{_destinationFolderPath}\r\n");
-            Console.WriteLine("***********************************************************");
-
-
-            if (isMirroring) DeleteNotExistFiles();
+            else
+            {
+                //複製先フォルダが有る場合にミラーリング実行。
+                if (isMirroring) DeleteNotExistFiles();
+            }
             UpdFiles();
         }
 
@@ -60,7 +61,6 @@ namespace FolderDuplicater
                     return temp;
                 }).Where(x => x.IsDeletedFile).ToList();
             delList.AsParallel().ForAll(file => file.DeleteDestFile());
-            Console.WriteLine("<削除完了>");
         }
 
         void UpdFiles()
