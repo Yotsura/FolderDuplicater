@@ -9,28 +9,47 @@ namespace FolderDuplicater
 {
     class FileData
     {
-        public bool IsNewFile { get; set; } = true;
-        public bool IsUpdatedFile { get; set; } = false;
+        public bool IsNewFile { get; set; }
+        public bool IsUpdatedFile { get; set; }
+        public bool IsDeletedFile { get; set; }
         public FileInfo OrigInfo { get; set; }
-        public string DestinationFolderPath { get; set; }
-        public string DestinationFilePath { get; set; }
-        public FileData((string origPath, string destPath) target, string filepath)
-        {
-            OrigInfo = new FileInfo(filepath);
-            DestinationFolderPath = OrigInfo.DirectoryName.Replace(target.origPath, target.destPath);
-            DestinationFilePath = OrigInfo.FullName.Replace(target.origPath, target.destPath);
+        public FileInfo DestInfo { get; set; }
 
-            if (!File.Exists(DestinationFilePath)) return;
-            IsNewFile = false;
-            var destinationInfo = new FileInfo(DestinationFilePath);
-            IsUpdatedFile = destinationInfo.LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc;
+        public FileData((string origPath, string destPath) target, string filepath, bool isOrig)
+        {
+            if (isOrig)
+            {
+                OrigInfo = new FileInfo(filepath);
+                DestInfo = new FileInfo(OrigInfo.FullName.Replace(target.origPath, target.destPath));
+            }
+            else
+            {
+                DestInfo = new FileInfo(filepath);
+                OrigInfo = new FileInfo(DestInfo.FullName.Replace(target.destPath, target.origPath));
+            }
+
+            //コピー元にのみ存在するか？
+            IsNewFile = !File.Exists(DestInfo.FullName);
+            //どちらにもあるなら更新されているか？
+            IsUpdatedFile = new FileInfo(DestInfo.FullName).LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc;
+            //コピー元にのみ存在するか？
+            IsDeletedFile = File.Exists(DestInfo.FullName) && !File.Exists(OrigInfo.FullName);
         }
 
         public void DupricateFile()
         {
-            if (!Directory.Exists(DestinationFolderPath))
-                Directory.CreateDirectory(DestinationFolderPath);
-            File.Copy(OrigInfo.FullName, DestinationFilePath, true);
+            if (!Directory.Exists(DestInfo.DirectoryName))
+                Directory.CreateDirectory(DestInfo.DirectoryName);
+            File.Copy(OrigInfo.FullName, DestInfo.FullName, true);
+        }
+
+        public void DeleteDestFile()
+        {
+            if (File.Exists(DestInfo.FullName))
+                File.Delete(DestInfo.FullName);
+            //フォルダが殻になった場合は自身を削除
+            if (!Directory.EnumerateFileSystemEntries(DestInfo.DirectoryName, "*", System.IO.SearchOption.AllDirectories).Any())
+                Directory.Delete(DestInfo.DirectoryName, false);
         }
     }
 }
