@@ -61,6 +61,7 @@ namespace FolderDuplicater
                     return temp;
                 }).Where(x => x.IsDeletedFile).ToList();
             delList.AsParallel().ForAll(file => file.DeleteDestFile());
+            Console.WriteLine($"\r\n削除対象ファイルは{delList.Count()}件です。");
         }
 
         void UpdFiles()
@@ -89,27 +90,13 @@ namespace FolderDuplicater
             var updatedfilecnt = _allfiles.Count(x => x.IsUpdatedFile);
             Console.WriteLine($"\r\n更新対象は全{_allfiles.Count}件です。");
             Console.WriteLine($"更新ファイル：{updatedfilecnt}件\r\n新規ファイル：{newfilecnt}件");
-            if (_allfiles.Count > 0) Duplicate();
+            if (_allfiles.Count > 0) _allfiles.AsParallel().ForAll(file => file.DupricateFile());
         }
 
         string GetProgressBar(int barLength, double per)
         {
             var bar = (int)Math.Floor(barLength * per);
             return $"【{new string('■', bar)}{new string('□', barLength - bar)}】";
-        }
-
-        void Duplicate()
-        {
-            var top = Console.CursorTop;
-            var left = Console.CursorLeft;
-            Console.WriteLine($"\r\n<複製中>");
-            //System.Threading.Thread.Sleep(3000);
-            _allfiles.AsParallel().ForAll(file =>
-            {
-                file.DupricateFile();
-            });
-            Console.SetCursorPosition(left, top);
-            Console.WriteLine($"\r\n<複製完了>");
         }
     }
 }
