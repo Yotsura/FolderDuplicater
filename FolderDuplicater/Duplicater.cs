@@ -23,21 +23,29 @@ namespace FolderDuplicater
             Console.WriteLine($"複製元のフォルダーのパス：{_origFolderPath}\r\n複製先のフォルダーのパス：{_destinationFolderPath}\r\n");
             Console.WriteLine("***********************************************************");
 
-            if (!Directory.Exists(_origFolderPath))
+            try
             {
-                Console.WriteLine("複製元フォルダーが存在しません。");
-                return;
+                if (!Directory.Exists(_origFolderPath))
+                {
+                    Console.WriteLine("複製元フォルダーが存在しません。");
+                    return;
+                }
+                if (!Directory.Exists(_destinationFolderPath))
+                {
+                    Console.WriteLine("複製先フォルダーが存在しません。フォルダが新規作成されます。");
+                }
+                else
+                {
+                    //複製先フォルダが有る場合にミラーリング実行。
+                    if (isMirroring) DeleteNotExistFiles();
+                }
+                UpdFiles();
             }
-            if (!Directory.Exists(_destinationFolderPath))
+            catch(Exception e)
             {
-                Console.WriteLine("複製先フォルダーが存在しません。フォルダが新規作成されます。");
+                Console.WriteLine(e);
+                Console.ReadKey();
             }
-            else
-            {
-                //複製先フォルダが有る場合にミラーリング実行。
-                if (isMirroring) DeleteNotExistFiles();
-            }
-            UpdFiles();
         }
 
         void DeleteNotExistFiles()
@@ -59,8 +67,8 @@ namespace FolderDuplicater
                     Console.Write(($"{GetProgressBar(20, per)}{cnt}/{checkListCnt}").PadRight(prePos));
 
                     return temp;
-                }).Where(x => x.IsDeletedFile).ToList();
-            delList.AsParallel().ForAll(file => file.DeleteDestFile());
+                }).Where(x => x.IsDeletedFile).OrderByDescending(x => x.DestInfo.FullName.Length).ToList();
+            delList.(file => file.DeleteDestFile());
             Console.WriteLine($"\r\n削除対象ファイルは{delList.Count()}件です。");
         }
 
