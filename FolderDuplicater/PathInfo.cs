@@ -16,21 +16,6 @@ namespace FolderDuplicater
         }
         public void ChangeSwttings()
         {
-            //if (PathPairs.Count() > 0)
-            //{
-            //    Console.WriteLine("***********************************************************");
-            //    foreach (var (Orig, Dest) in PathPairs)
-            //        Console.WriteLine($"複製元のフォルダーのパス：{Orig}\r\n複製先のフォルダーのパス：{Dest}\r\n");
-            //    Console.WriteLine("***********************************************************");
-            //    Console.WriteLine("このまま実行しますか？　Y/N");
-            //    switch (Console.ReadKey().Key)
-            //    {
-            //        case ConsoleKey.Y: return;
-            //        case ConsoleKey.N: break;
-            //        default: break;
-            //    }
-            //}
-
             //設定追加
             for (; ; )
             {

@@ -14,7 +14,7 @@ namespace FolderDuplicater
         string _destinationFolderPath { get; set; }
         bool IsMirroring { get; set; }
 
-        public Duplicater((string origPath,string destPath)target,bool isMirroring)
+        public Duplicater((string origPath, string destPath) target, bool isMirroring)
         {
             _origFolderPath = target.origPath;
             _destinationFolderPath = target.destPath;
@@ -25,23 +25,27 @@ namespace FolderDuplicater
 
             try
             {
-                if (!Directory.Exists(_origFolderPath))
+                if (!Directory.Exists(_origFolderPath) && !Directory.Exists(_destinationFolderPath))
+                {
+                    Console.WriteLine("複製元/複製先フォルダーが存在しません。");
+                    return;
+                }
+                else if (!Directory.Exists(_origFolderPath))
                 {
                     Console.WriteLine("複製元フォルダーが存在しません。");
                     return;
                 }
-                if (!Directory.Exists(_destinationFolderPath))
+                else if (!Directory.Exists(_destinationFolderPath))
                 {
-                    Console.WriteLine("複製先フォルダーが存在しません。フォルダが新規作成されます。");
+                    Console.WriteLine("複製先フォルダーが存在しません。");
+                    return;
                 }
-                else
-                {
-                    //複製先フォルダが有る場合にミラーリング実行。
-                    if (isMirroring) DeleteNotExistFiles();
-                }
+
+                //複製先フォルダが有る場合に削除実行。
+                if (isMirroring) DeleteNotExistFiles();
                 UpdFiles();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
                 Console.ReadKey();
@@ -50,7 +54,7 @@ namespace FolderDuplicater
 
         void DeleteNotExistFiles()
         {
-            Console.WriteLine($"\r\n削除対象のリストアップ中...");
+            Console.WriteLine($"\r\n削除済みファイルをリストアップ中...");
             var checkList = Directory.EnumerateFiles(_destinationFolderPath, "*", System.IO.SearchOption.AllDirectories);
             var checkListCnt = checkList.Count();
 
@@ -69,12 +73,12 @@ namespace FolderDuplicater
                     return temp;
                 }).Where(x => x.IsDeletedFile).OrderByDescending(x => x.DestInfo.FullName.Length).ToList();
             delList.ForEach(file => file.DeleteDestFile());
-            Console.WriteLine($"\r\n削除対象ファイルは{delList.Count()}件です。");
+            Console.WriteLine($"\r\n{delList.Count()}件のファイルを削除しました。");
         }
 
         void UpdFiles()
         {
-            Console.WriteLine($"\r\n更新対象のリストアップ中...");
+            Console.WriteLine($"\r\n更新されたファイルをリストアップ中...");
             var checkList = Directory.EnumerateFiles(_origFolderPath, "*", System.IO.SearchOption.AllDirectories);
             var checkListCnt = checkList.Count();
 
@@ -96,8 +100,7 @@ namespace FolderDuplicater
             Console.WriteLine($"\r\n更新対象のリストアップ完了");
             var newfilecnt = _allfiles.Count(x => x.IsNewFile);
             var updatedfilecnt = _allfiles.Count(x => x.IsUpdatedFile);
-            Console.WriteLine($"\r\n更新対象は全{_allfiles.Count}件です。");
-            Console.WriteLine($"更新ファイル：{updatedfilecnt}件\r\n新規ファイル：{newfilecnt}件");
+            Console.WriteLine($"\r\n更新対象は全{_allfiles.Count}件です。\r\n更新ファイル：{updatedfilecnt}件\r\n新規ファイル：{newfilecnt}件\r\n");
             if (_allfiles.Count > 0) _allfiles.AsParallel().ForAll(file => file.DupricateFile());
         }
 
