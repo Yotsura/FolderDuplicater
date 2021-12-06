@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderDuplicater", "FolderDuplicater\FolderDuplicater.csproj", "{D464496E-1606-46D8-A60B-48BFBF05DC06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileMirror", "FileMirror\FileMirror.csproj", "{2F50C3CF-487F-4463-A6FF-7BBB485FC646}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{D464496E-1606-46D8-A60B-48BFBF05DC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D464496E-1606-46D8-A60B-48BFBF05DC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D464496E-1606-46D8-A60B-48BFBF05DC06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F50C3CF-487F-4463-A6FF-7BBB485FC646}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F50C3CF-487F-4463-A6FF-7BBB485FC646}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F50C3CF-487F-4463-A6FF-7BBB485FC646}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F50C3CF-487F-4463-A6FF-7BBB485FC646}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
