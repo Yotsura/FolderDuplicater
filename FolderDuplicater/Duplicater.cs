@@ -12,13 +12,11 @@ namespace FolderDuplicater
         List<FileData> _allfiles { get; set; }
         string _origFolderPath { get; set; }
         string _destinationFolderPath { get; set; }
-        bool IsMirroring { get; set; }
 
         public Duplicater((string origPath, string destPath) target, bool isMirroring)
         {
             _origFolderPath = target.origPath;
             _destinationFolderPath = target.destPath;
-            IsMirroring = isMirroring;
             Console.WriteLine("***********************************************************");
             Console.WriteLine($"複製元のフォルダーのパス：{_origFolderPath}\r\n複製先のフォルダーのパス：{_destinationFolderPath}\r\n");
             Console.WriteLine("***********************************************************");

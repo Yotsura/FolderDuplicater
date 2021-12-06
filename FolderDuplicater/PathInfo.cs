@@ -8,12 +8,8 @@ namespace FolderDuplicater
 {
     class PathInfo
     {
-        public List<(string Orig, string Dest)> PathPairs { get; set; }
+        public List<(string Orig, string Dest)> PathPairs { get; set; } = Settings.Default.PathPairs;
 
-        public PathInfo()
-        {
-            PathPairs = Settings.Default.PathPairs;
-        }
         public void ChangeSwttings()
         {
             //設定追加
