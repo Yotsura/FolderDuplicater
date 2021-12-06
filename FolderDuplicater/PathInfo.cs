@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FolderDuplicater
 {
-    class PathInfo
+    public class PathInfo
     {
         public List<(string Orig, string Dest)> PathPairs { get; set; } = Settings.Default.PathPairs;
 

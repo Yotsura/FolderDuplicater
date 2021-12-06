@@ -25,7 +25,7 @@
         </Grid.RowDefinitions>
         <Menu Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="3">
             <MenuItem Header="ファイル(_C)">
-                <MenuItem Header="設定の変更"/>
+                <MenuItem Header="設定の保存" Click="SaveSettings"/>
                 <MenuItem Header="ミラーリングの実行"/>
             </MenuItem>
             <MenuItem Header="ヘルプ(_H)">
@@ -39,7 +39,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="バックアップ元："></Label>
-            <TextBox Grid.Column="2"></TextBox>
+            <TextBox x:Name="origPath" Grid.Column="2"></TextBox>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="4">
             <Grid.ColumnDefinitions>
@@ -48,7 +48,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="バックアップ先："></Label>
-            <TextBox Grid.Column="2"></TextBox>
+            <TextBox x:Name="destPath" Grid.Column="2"></TextBox>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="6">
             <Grid.ColumnDefinitions>
@@ -62,17 +62,17 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="設定："></Label>
-            <Button Grid.Column="2" Content="追加"></Button>
-            <Button Grid.Column="4" Content="更新"></Button>
-            <Button Grid.Column="6" Content="削除"></Button>
+            <Button Grid.Column="2" Content="追加" Click="AddItem"></Button>
+            <Button Grid.Column="4" Content="更新" Click="UpdItem"></Button>
+            <Button Grid.Column="6" Content="削除" Click="DelItem"></Button>
         </Grid>
-        <ListBox Grid.Column="1" Grid.Row="8" ItemsSource="{Binding Items}" SelectedIndex="{Binding CurrentIndex}" b:ReorderableItemsControlBehavior.Callback="{Binding DropCallback}" AllowDrop="True" />
+        <ListBox Grid.Column="1" Grid.Row="8" ItemsSource="{Binding Items}" SelectedIndex="{Binding CurrentIndex}" SelectionChanged="ListBox_SelectionChanged" b:ReorderableItemsControlBehavior.Callback="{Binding DropCallback}" AllowDrop="True" />
         <Grid Grid.Column="1" Grid.Row="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="2" Content="ミラーリング実行"></Button>
+            <Button Grid.Column="2" Content="ミラーリング実行" Click="Button_Click"></Button>
         </Grid>
     </Grid>
 </Window>
