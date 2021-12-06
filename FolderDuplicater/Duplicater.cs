@@ -68,7 +68,7 @@ namespace FolderDuplicater
 
                     return temp;
                 }).Where(x => x.IsDeletedFile).OrderByDescending(x => x.DestInfo.FullName.Length).ToList();
-            delList.(file => file.DeleteDestFile());
+            delList.ForEach(file => file.DeleteDestFile());
             Console.WriteLine($"\r\n削除対象ファイルは{delList.Count()}件です。");
         }
 
