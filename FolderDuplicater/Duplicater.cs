@@ -9,9 +9,9 @@ namespace FolderDuplicater
 {
     class Duplicater
     {
-        List<FileData> _allfiles { get; set; }
-        string _origFolderPath { get; set; }
-        string _destinationFolderPath { get; set; }
+        List<FileData> _allfiles;
+        readonly string _origFolderPath;
+        readonly string _destinationFolderPath;
 
         public Duplicater((string origPath, string destPath) target, bool isMirroring)
         {
@@ -54,20 +54,13 @@ namespace FolderDuplicater
         {
             Console.WriteLine($"\r\n削除済みファイルをリストアップ中...");
             var checkList = Directory.EnumerateFiles(_destinationFolderPath, "*", System.IO.SearchOption.AllDirectories);
-            var checkListCnt = checkList.Count();
-
-            var cnt = 0;
-            int prePos = Console.CursorLeft;//現在カーソル位置を取得
+            var bar = new ProgressBar(checkList.Count());
 
             var delList = checkList
                 .Select(file =>
                 {
-                    cnt++;
                     var temp = new FileData((_origFolderPath, _destinationFolderPath), file, false);
-                    var per = (double)cnt / (double)checkListCnt;
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    Console.Write(($"{GetProgressBar(20, per)}{cnt}/{checkListCnt}").PadRight(prePos));
-
+                    bar.AddCnt();
                     return temp;
                 }).Where(x => x.IsDeletedFile).OrderByDescending(x => x.DestInfo.FullName.Length).ToList();
             delList.ForEach(file => file.DeleteDestFile());
@@ -78,20 +71,13 @@ namespace FolderDuplicater
         {
             Console.WriteLine($"\r\n更新されたファイルをリストアップ中...");
             var checkList = Directory.EnumerateFiles(_origFolderPath, "*", System.IO.SearchOption.AllDirectories);
-            var checkListCnt = checkList.Count();
-
-            var cnt = 0;
-            int prePos = Console.CursorLeft;//現在カーソル位置を取得
+            var bar = new ProgressBar(checkList.Count());
 
             _allfiles = checkList
                 .Select(file =>
                 {
-                    cnt++;
                     var temp = new FileData((_origFolderPath, _destinationFolderPath), file, true);
-                    var per = (double)cnt / (double)checkListCnt;
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    Console.Write(($"{GetProgressBar(20, per)}{cnt}/{checkListCnt}").PadRight(prePos));
-
+                    bar.AddCnt();
                     return temp;
                 }).Where(x => x.IsNewFile || x.IsUpdatedFile).ToList();
 
@@ -100,12 +86,6 @@ namespace FolderDuplicater
             var updatedfilecnt = _allfiles.Count(x => x.IsUpdatedFile);
             Console.WriteLine($"\r\n更新対象は全{_allfiles.Count}件です。\r\n更新ファイル：{updatedfilecnt}件\r\n新規ファイル：{newfilecnt}件\r\n");
             if (_allfiles.Count > 0) _allfiles.AsParallel().ForAll(file => file.DupricateFile());
-        }
-
-        string GetProgressBar(int barLength, double per)
-        {
-            var bar = (int)Math.Floor(barLength * per);
-            return $"【{new string('■', bar)}{new string('□', barLength - bar)}】";
         }
     }
 }
