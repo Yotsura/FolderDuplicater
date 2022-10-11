@@ -23,10 +23,10 @@ namespace FileMirror
         public MainWindow()
         {
             InitializeComponent();
-            _mvm = new MainViewModel();
+            _mvm = new MainWindowViewModel();
             this.DataContext = _mvm;
         }
-        MainViewModel _mvm;
+        MainWindowViewModel _mvm;
 
         private void SaveSettings(object sender, RoutedEventArgs e)
         {

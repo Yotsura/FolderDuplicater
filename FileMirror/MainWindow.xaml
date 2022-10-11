@@ -3,6 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:b="clr-namespace:FileMirror.Views.Behaviors"
         Title="MainWindow" Height="400" Width="900">
+    <Window.Resources>
+        <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding Data}" >
+        </CollectionViewSource>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
@@ -66,7 +70,22 @@
             <Button Grid.Column="4" Content="更新" Click="UpdItem"></Button>
             <Button Grid.Column="6" Content="削除" Click="DelItem"></Button>
         </Grid>
-        <ListBox Grid.Column="1" Grid.Row="8" ItemsSource="{Binding Items}" SelectedIndex="{Binding CurrentIndex}" SelectionChanged="ListBox_SelectionChanged" b:ReorderableItemsControlBehavior.Callback="{Binding DropCallback}" AllowDrop="True" />
+        <ListBox Grid.Column="1" Grid.Row="8" ItemsSource="{Binding Items}"
+                 SelectedIndex="{Binding CurrentIndex}" SelectionChanged="ListBox_SelectionChanged"
+                 b:ReorderableItemsControlBehavior.Callback="{Binding DropCallback}"
+                 AllowDrop="True" />
+        <!--<DataGrid Grid.Column="1" Grid.Row="8"
+                AutoGenerateColumns="False" IsReadOnly="True"
+                ItemsSource="{Binding Source={StaticResource NowDataView}}"
+                MouseDoubleClick="CoDataGrid_MouseDoubleClick"
+                MouseRightButtonDown="CreateContextMenu_MouseRightButton">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="" MinWidth="50" Width="50" Binding="{Binding Co,Mode=OneWay}"/>
+                <DataGridTextColumn Header="ミラー元" MinWidth="80" Width="*" Binding="{Binding Name,Mode=OneWay}"/>
+                <DataGridTextColumn Header="ミラー先" MinWidth="60" Width="*" Binding="{Binding SystemNo,Mode=OneWay}"/>
+            </DataGrid.Columns>
+        </DataGrid>-->
+        
         <Grid Grid.Column="1" Grid.Row="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

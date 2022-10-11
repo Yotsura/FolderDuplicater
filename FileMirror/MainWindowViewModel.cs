@@ -10,9 +10,9 @@ using System.Windows.Input;
 namespace FileMirror
 {
 
-    internal class MainViewModel : INotifyPropertyChanged
+    internal class MainWindowViewModel : INotifyPropertyChanged
     {
-        internal MainViewModel()
+        internal MainWindowViewModel()
         {
             var test = AppSettings.Default.PathPairs;
             _items.Clear();
