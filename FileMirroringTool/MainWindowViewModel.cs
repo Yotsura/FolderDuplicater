@@ -14,9 +14,13 @@ namespace FileMirroringTool
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         public ICommand MirrorListCtrlCommand { get; private set; }
+        public ICommand SettingCtrlCommand { get; private set; }
         public MainWindowViewModel()
         {
             MirrorListCtrlCommand = new MirrorListCtrl(this);
+            SettingCtrlCommand = new SettingCtrl(this);
+            if (Settings.Default.MirrorList != null)
+                MirrorList = new ObservableCollection<MirrorInfo>(Settings.Default.MirrorList);
         }
 
         #region INotifyPropertyChanged
@@ -27,12 +31,7 @@ namespace FileMirroringTool
         private string _origPath = string.Empty;
         private string _destPath = string.Empty;
         private MirrorInfo _selectedMirrorInfo;
-        private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>()
-        {
-            new MirrorInfo{ Idx=1,DestPath="destpath1",OrigPath="origpath1",IsChecked=true},
-            new MirrorInfo{ Idx=2,DestPath="destpath2",OrigPath="origpath2"},
-            new MirrorInfo{ Idx=3,DestPath="destpath3",OrigPath="origpath3",IsChecked=true},
-        };
+        private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>();
 
         public MirrorInfo SelectedMirrorInfo
         {
