@@ -23,6 +23,14 @@ namespace FileMirroringTool
         public MainWindow()
         {
             InitializeComponent();
+            MainDataGrid.UnselectAll();
+        }
+
+        private void DataGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed) return;
+            if (MainDataGrid.SelectedIndex > -1)
+                MainDataGrid.UnselectAll();
         }
     }
 }

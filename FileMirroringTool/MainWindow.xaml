@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileMirroringTool"
+        xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="MainWindow" Height="400" Width="900">
     <Window.DataContext>
@@ -11,6 +12,9 @@
     </Window.DataContext>
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="Idx" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </Window.Resources>
     <Grid>
@@ -79,8 +83,11 @@
             <Button Grid.Column="6" Content="削除" Command="{Binding MirrorListCtrlCommand}" CommandParameter="del" ></Button>
         </Grid>
         <DataGrid Grid.Column="1" Grid.Row="8"
-                AutoGenerateColumns="False" IsReadOnly="True"
-                ItemsSource="{Binding Source={StaticResource NowDataView}}">
+                AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1"
+                SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
+                ItemsSource="{Binding Source={StaticResource NowDataView}}"
+                  Name="MainDataGrid"
+                MouseDown="DataGrid_MouseDown">
             <DataGrid.Columns>
                 <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="50">
                     <DataGridTemplateColumn.CellTemplate>

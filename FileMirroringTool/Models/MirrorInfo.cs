@@ -8,9 +8,9 @@ namespace FileMirroringTool.Models
 {
     public class MirrorInfo
     {
-        public int Idx { get; set; }
-        public bool IsChecked { get; set; }
-        public string OrigPath { get; set; }
-        public string DestPath { get; set; }
+        public int Idx { get; set; } = -1;
+        public bool IsChecked { get; set; } = true;
+        public string OrigPath { get; set; } = string.Empty;
+        public string DestPath { get; set; } = string.Empty;
     }
 }

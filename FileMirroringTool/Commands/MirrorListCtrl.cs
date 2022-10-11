@@ -24,35 +24,47 @@ namespace FileMirroringTool.Commands
 
         public bool CanExecute(object parameter)
         {
+            if (string.IsNullOrEmpty(_mwvm.OrigPath) ||
+                string.IsNullOrEmpty(_mwvm.DestPath))
+                return false;
+
             switch (parameter.ToString())
             {
                 case "add":
-                    return true;
+                    return _mwvm.SelectedMirrorInfo == null;
                 case "upd":
-                    return true;
                 case "del":
-                    return true;
+                    return _mwvm.SelectedMirrorInfo != null;
+                default:
+                    return false;
             }
-            return false;
         }
 
         public void Execute(object parameter)
         {
+            var idx = _mwvm.MirrorList.OrderByDescending(x => x.Idx).FirstOrDefault()?.Idx ?? 0;
+
             var inputdata = new MirrorInfo
             {
+                Idx = _mwvm.SelectedMirrorInfo?.Idx ?? (idx + 1),
                 OrigPath = _mwvm.OrigPath,
                 DestPath = _mwvm.DestPath,
             };
+            var targetItem = _mwvm.MirrorList.FirstOrDefault(x => x.Idx == inputdata.Idx);
             switch (parameter.ToString())
             {
                 case "add":
                     _mwvm.MirrorList.Add(inputdata);
+                    _mwvm.OrigPath = string.Empty;
+                    _mwvm.DestPath = string.Empty;
                     break;
                 case "upd":
-                    //_mwvm.MirrorList.First(x => x == inputdata) = inputdata;
+                    _mwvm.SelectedMirrorInfo = null;
+                    _mwvm.MirrorList.Remove(targetItem);
+                    _mwvm.MirrorList.Add(inputdata);
                     break;
                 case "del":
-                    _mwvm.MirrorList.Remove(inputdata);
+                    _mwvm.MirrorList.Remove(targetItem);
                     break;
             }
         }

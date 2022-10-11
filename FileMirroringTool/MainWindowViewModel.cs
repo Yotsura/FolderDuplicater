@@ -24,16 +24,29 @@ namespace FileMirroringTool
         private void OnPropertyChanged(string propertyName)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-
         private string _origPath = string.Empty;
         private string _destPath = string.Empty;
-        //private MirrorInfo _selectedMirrorItem;
+        private MirrorInfo _selectedMirrorInfo;
         private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>()
         {
-            new MirrorInfo{DestPath="destpath1",OrigPath="origpath1",IsChecked=true},
-            new MirrorInfo{DestPath="destpath2",OrigPath="origpath2"},
-            new MirrorInfo{DestPath="destpath3",OrigPath="origpath3",IsChecked=true},
+            new MirrorInfo{ Idx=1,DestPath="destpath1",OrigPath="origpath1",IsChecked=true},
+            new MirrorInfo{ Idx=2,DestPath="destpath2",OrigPath="origpath2"},
+            new MirrorInfo{ Idx=3,DestPath="destpath3",OrigPath="origpath3",IsChecked=true},
         };
+
+        public MirrorInfo SelectedMirrorInfo
+        {
+            get => _selectedMirrorInfo;
+            set
+            {
+                _selectedMirrorInfo = value;
+                OnPropertyChanged(nameof(SelectedMirrorInfo));
+                OrigPath = value?.OrigPath ?? string.Empty;
+                OnPropertyChanged(nameof(OrigPath));
+                DestPath = value?.DestPath ?? string.Empty;
+                OnPropertyChanged(nameof(DestPath));
+            }
+        }
 
         public string OrigPath
         {
@@ -44,6 +57,7 @@ namespace FileMirroringTool
                 OnPropertyChanged(nameof(OrigPath));
             }
         }
+
         public string DestPath
         {
             get => _destPath;
