@@ -6,14 +6,14 @@
         xmlns:local="clr-namespace:FileMirroringTool"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="900">
+        Title="MainWindow" Height="500" Width="900">
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
             <CollectionViewSource.SortDescriptions>
-                <componentModel:SortDescription PropertyName="Idx" Direction="Ascending"/>
+                <componentModel:SortDescription PropertyName="SortPara" Direction="Ascending"/>
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </Window.Resources>
@@ -29,6 +29,8 @@
             <RowDefinition Height="26"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="26"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="26"/>
             <RowDefinition Height="10"/>
@@ -52,9 +54,9 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="バックアップ元："></Label>
-            <TextBox x:Name="origPath" Grid.Column="2"
-                     Text="{Binding OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Label Grid.Column="0" Content="Sort："></Label>
+            <TextBox Grid.Column="2"
+                     Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="4">
             <Grid.ColumnDefinitions>
@@ -62,11 +64,22 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="バックアップ先："></Label>
-            <TextBox x:Name="destPath" Grid.Column="2"
-                     Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Label Grid.Column="0" Content="バックアップ元："></Label>
+            <TextBox Grid.Column="2"
+                     Text="{Binding OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="バックアップ先："></Label>
+            <TextBox Grid.Column="2"
+                     Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" AcceptsReturn="True" ></TextBox>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="5"/>
@@ -88,14 +101,14 @@
             <Button Grid.Column="8" Content="保存" Command="{Binding SettingCtrlCommand}" CommandParameter="save"></Button>
             <Button Grid.Column="10" Content="再読込" Command="{Binding SettingCtrlCommand}" CommandParameter="reload"></Button>
         </Grid>
-        <DataGrid Grid.Column="1" Grid.Row="8"
+        <DataGrid Grid.Column="1" Grid.Row="10"
                 AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1"
                 SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
                 ItemsSource="{Binding Source={StaticResource NowDataView}}"
                 Name="MainDataGrid"
                 MouseDown="DataGrid_MouseDown">
             <DataGrid.Columns>
-                <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="50">
+                <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="50" CanUserResize="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -103,12 +116,14 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
+                <DataGridTextColumn Header="Sort" Width="50" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
                 <DataGridTextColumn Header="ミラー元" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
-                <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPath,Mode=OneWay}"/>
+                <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Column="1" Grid.Row="10">
+        <Grid Grid.Column="1" Grid.Row="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="150"/>

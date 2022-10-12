@@ -28,6 +28,7 @@ namespace FileMirroringTool
         private void OnPropertyChanged(string propertyName)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        private string _sort = string.Empty;
         private string _origPath = string.Empty;
         private string _destPath = string.Empty;
         private MirrorInfo _selectedMirrorInfo;
@@ -40,10 +41,23 @@ namespace FileMirroringTool
             {
                 _selectedMirrorInfo = value;
                 OnPropertyChanged(nameof(SelectedMirrorInfo));
+
+                Sort = value?.Sort.ToString() ?? string.Empty;
+                OnPropertyChanged(nameof(Sort));
                 OrigPath = value?.OrigPath ?? string.Empty;
                 OnPropertyChanged(nameof(OrigPath));
-                DestPath = value?.DestPath ?? string.Empty;
+                DestPath = value?.DestPathsStr ?? string.Empty;
                 OnPropertyChanged(nameof(DestPath));
+            }
+        }
+
+        public string Sort
+        {
+            get => _sort;
+            set
+            {
+                _sort = value;
+                OnPropertyChanged(nameof(Sort));
             }
         }
 

@@ -42,19 +42,20 @@ namespace FileMirroringTool.Commands
 
         public void Execute(object parameter)
         {
-            var idx = _mwvm.MirrorList.OrderByDescending(x => x.Idx).FirstOrDefault()?.Idx ?? 0;
-
+            var nextID = (_mwvm.MirrorList.OrderByDescending(x => x.ID).FirstOrDefault()?.ID ?? 0) + 1;
             var inputdata = new MirrorInfo
             {
-                Idx = _mwvm.SelectedMirrorInfo?.Idx ?? (idx + 1),
+                ID = _mwvm.SelectedMirrorInfo?.ID ?? nextID,
+                Sort = int.TryParse(_mwvm.Sort, out var snum) ? snum : 0,
                 OrigPath = _mwvm.OrigPath,
-                DestPath = _mwvm.DestPath,
+                DestPathsStr = _mwvm.DestPath,
             };
-            var targetItem = _mwvm.MirrorList.FirstOrDefault(x => x.Idx == inputdata.Idx);
+            var targetItem = _mwvm.MirrorList.FirstOrDefault(x => x.ID == inputdata.ID);
             switch (parameter.ToString())
             {
                 case "add":
                     _mwvm.MirrorList.Add(inputdata);
+                    _mwvm.Sort = string.Empty;
                     _mwvm.OrigPath = string.Empty;
                     _mwvm.DestPath = string.Empty;
                     break;

@@ -17,9 +17,27 @@ namespace FileMirroringTool.Commands
             _mwvm = mwvm;
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
-        public bool CanExecute(object parameter) => true;
+        public bool CanExecute(object parameter)
+        {
+            switch (parameter.ToString())
+            {
+                case "save":
+                    var list1 = _mwvm.MirrorList.OrderBy(x=>x.ID).ToList();
+                    var list2 = Settings.Default.MirrorList.OrderBy(x=>x.ID).ToList();
+                    var result = !list1.SequenceEqual(list2);
+                    return result;
+                case "reload":
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         public void Execute(object parameter)
         {
