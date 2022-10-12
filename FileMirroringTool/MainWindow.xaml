@@ -128,7 +128,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="150"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="2" Content="ミラーリング実行" ></Button>
+            <Button Grid.Column="2" Content="ミラーリング実行" Command="{Binding MirroringCommand}"></Button>
         </Grid>
     </Grid>
 </Window>

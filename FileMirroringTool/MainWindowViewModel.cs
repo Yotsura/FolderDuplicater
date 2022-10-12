@@ -15,10 +15,12 @@ namespace FileMirroringTool
     {
         public ICommand MirrorListCtrlCommand { get; private set; }
         public ICommand SettingCtrlCommand { get; private set; }
+        public ICommand MirroringCommand { get; private set; }
         public MainWindowViewModel()
         {
             MirrorListCtrlCommand = new MirrorListCtrl(this);
             SettingCtrlCommand = new SettingCtrl(this);
+            MirroringCommand = new MirroringCtrl(this);
             if (Settings.Default.MirrorList != null)
                 MirrorList = new ObservableCollection<MirrorInfo>(Settings.Default.MirrorList);
         }
