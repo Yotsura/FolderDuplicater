@@ -43,7 +43,10 @@ namespace FileMirroringTool.Commands
             }, cancelToken);
 
             pd.ShowDialog();
-            System.Windows.MessageBox.Show("ミラーリングが完了しました。");
+            if (pd.IsCanceled)
+                System.Windows.MessageBox.Show("ミラーリングが停止されました。");
+            else
+                System.Windows.MessageBox.Show("ミラーリングが完了しました。");
         }
     }
 }

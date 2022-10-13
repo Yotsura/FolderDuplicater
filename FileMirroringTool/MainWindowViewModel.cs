@@ -139,7 +139,7 @@ namespace FileMirroringTool
             }
         }
 
-        private string _prgTitle = "＜作業中＞ファイル名";
+        private string _prgTitle = "＜作業内容＞ファイル名";
         public string PrgTitle
         {
             get => _prgTitle;
@@ -150,11 +150,23 @@ namespace FileMirroringTool
             }
         }
 
+        private string _prgFileName = string.Empty;
+        public string PrgFileName
+        {
+            get => _prgFileName;
+            set
+            {
+                _prgFileName = value;
+                OnPropertyChanged(nameof(PrgFileName));
+            }
+        }
+
         public void ResetPrgStat()
         {
             FileCnt_Target = 0;
             FileCnt_Checked = 0;
-            PrgTitle = string.Empty;
+            PrgTitle = "＜リスト作成中＞";
+            PrgFileName = string.Empty;
         }
         #endregion
     }
