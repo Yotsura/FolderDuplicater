@@ -64,7 +64,7 @@ namespace FileMirroringTool.Models
                 var updList =
                     Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
                     .OrderByDescending(x => x).ToArray();
-                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count();
+                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * DestPathsList.Count();
 
                 foreach (var (dir, files) in delList)
                 {
@@ -72,7 +72,6 @@ namespace FileMirroringTool.Models
                     foreach (var file in files)
                     {
                         mwvm.FileCnt_Checked++;
-                        System.Threading.Thread.Sleep(1000);
                         var data = new FileData(OrigPath, dir, file, false);
                         if (data.IsDeletedFile)
                             data.DeleteDestFile();
@@ -85,7 +84,6 @@ namespace FileMirroringTool.Models
                     foreach (var file in updList)
                     {
                         mwvm.FileCnt_Checked++;
-                        System.Threading.Thread.Sleep(1000);
                         var data = new FileData(OrigPath, destPath, file, true);
                         if (data.IsNewFile || data.IsUpdatedFile)
                             data.DupricateFile();
