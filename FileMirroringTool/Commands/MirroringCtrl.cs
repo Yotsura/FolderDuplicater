@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -28,9 +29,20 @@ namespace FileMirroringTool.Commands
 
         public void Execute(object parameter)
         {
+            _mwvm.ResetPrgStat();
             _mwvm.MirrorList.Where(x => x.IsChecked)
                 .OrderBy(x => x.SortPara)
-                .ToList().ForEach(mirror => mirror.MirroringInvoke());
+                .ToList().ForEach(mirror =>
+                {
+                    //Progressウィンドウ開く
+                    CancellationTokenSource cancelToken = new CancellationTokenSource();
+                    ProgressDialog pd = new ProgressDialog(_mwvm, () =>
+                    {
+                        mirror.MirroringInvoke(_mwvm);
+                    }, cancelToken);
+
+                    pd.ShowDialog();
+                });
             System.Windows.MessageBox.Show("ミラーリングが完了しました。");
         }
     }

@@ -47,7 +47,7 @@ namespace FileMirroringTool.Models
             return hashCode;
         }
 
-        public void MirroringInvoke()
+        public void MirroringInvoke(MainWindowViewModel mwvm)
         {
             var existDestPath = DestPathsList.Where(x => Directory.Exists(x)).ToList();
             if (!Directory.Exists(OrigPath) || existDestPath.Count() < 1)
@@ -64,13 +64,15 @@ namespace FileMirroringTool.Models
                 var updList =
                     Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
                     .OrderByDescending(x => x).ToArray();
-                FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count();
+                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count();
 
                 foreach (var (dir, files) in delList)
                 {
+                    mwvm.PrgTitle = $"＜削除中＞{OrigPath} -> {dir}";
                     foreach (var file in files)
                     {
-                        FileCnt_Checked++;
+                        mwvm.FileCnt_Checked++;
+                        System.Threading.Thread.Sleep(1000);
                         var data = new FileData(OrigPath, dir, file, false);
                         if (data.IsDeletedFile)
                             data.DeleteDestFile();
@@ -79,9 +81,11 @@ namespace FileMirroringTool.Models
 
                 foreach (var destPath in DestPathsList)
                 {
+                    mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath}";
                     foreach (var file in updList)
                     {
-                        FileCnt_Checked++;
+                        mwvm.FileCnt_Checked++;
+                        System.Threading.Thread.Sleep(1000);
                         var data = new FileData(OrigPath, destPath, file, true);
                         if (data.IsNewFile || data.IsUpdatedFile)
                             data.DupricateFile();

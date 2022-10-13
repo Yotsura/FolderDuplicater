@@ -92,6 +92,70 @@ namespace FileMirroringTool
                 OnPropertyChanged(nameof(MirrorList));
             }
         }
+
+        /* progress */
+        private double _fileCnt_Target = 0;
+        private double _fileCnt_Checked = 0;
+        public double FileCnt_Target
+        {
+            get => _fileCnt_Target;
+            set
+            {
+                _fileCnt_Target = value;
+                PrgVal = (int)Math.Floor(100 * (_fileCnt_Checked / _fileCnt_Target));
+                PrgStr = $"{_fileCnt_Checked}/{_fileCnt_Target}";
+            }
+        }
+
+        public double FileCnt_Checked
+        {
+            get => _fileCnt_Checked;
+            set
+            {
+                _fileCnt_Checked = value;
+                PrgVal = (int)Math.Floor(100 * (_fileCnt_Checked / _fileCnt_Target));
+                PrgStr = $"{_fileCnt_Checked}/{_fileCnt_Target}";
+            }
+        }
+
+        private int _prgVal = 0;
+        public int PrgVal
+        {
+            get => _prgVal;
+            set
+            {
+                _prgVal = value;
+                OnPropertyChanged(nameof(PrgVal));
+            }
+        }
+        private string _prgStr = "0/0";
+        public string PrgStr
+        {
+            get => _prgStr;
+            set
+            {
+                _prgStr = value;
+                OnPropertyChanged(nameof(PrgStr));
+            }
+        }
+
+        private string _prgTitle = "＜作業中＞ファイル名";
+        public string PrgTitle
+        {
+            get => _prgTitle;
+            set
+            {
+                _prgTitle = value;
+                OnPropertyChanged(nameof(PrgTitle));
+            }
+        }
+
+        public void ResetPrgStat()
+        {
+            FileCnt_Target = 0;
+            FileCnt_Checked = 0;
+            PrgTitle = string.Empty;
+        }
         #endregion
     }
 }
