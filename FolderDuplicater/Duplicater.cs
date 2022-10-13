@@ -7,7 +7,7 @@ using System.IO;
 
 namespace FolderDuplicater
 {
-    class Duplicater
+    public class Duplicater
     {
         List<FileData> _allfiles;
         readonly string _origFolderPath;
@@ -52,7 +52,6 @@ namespace FolderDuplicater
 
         void DeleteNotExistFiles()
         {
-            Console.WriteLine($"\r\n削除済みファイルをリストアップ中...");
             var checkList = Directory.EnumerateFiles(_destinationFolderPath, "*", System.IO.SearchOption.AllDirectories);
             var bar = new ProgressBar(checkList.Count());
 
@@ -64,12 +63,10 @@ namespace FolderDuplicater
                     return temp;
                 }).Where(x => x.IsDeletedFile).OrderByDescending(x => x.DestInfo.FullName.Length).ToList();
             delList.ForEach(file => file.DeleteDestFile());
-            Console.WriteLine($"\r\n{delList.Count()}件のファイルを削除しました。");
         }
 
         void UpdFiles()
         {
-            Console.WriteLine($"\r\n更新されたファイルをリストアップ中...");
             var checkList = Directory.EnumerateFiles(_origFolderPath, "*", System.IO.SearchOption.AllDirectories);
             var bar = new ProgressBar(checkList.Count());
 
@@ -81,10 +78,6 @@ namespace FolderDuplicater
                     return temp;
                 }).Where(x => x.IsNewFile || x.IsUpdatedFile).ToList();
 
-            Console.WriteLine($"\r\n更新対象のリストアップ完了");
-            var newfilecnt = _allfiles.Count(x => x.IsNewFile);
-            var updatedfilecnt = _allfiles.Count(x => x.IsUpdatedFile);
-            Console.WriteLine($"\r\n更新対象は全{_allfiles.Count}件です。\r\n更新ファイル：{updatedfilecnt}件\r\n新規ファイル：{newfilecnt}件\r\n");
             if (_allfiles.Count > 0) _allfiles.AsParallel().ForAll(file => file.DupricateFile());
         }
     }

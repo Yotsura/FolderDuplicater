@@ -1,0 +1,134 @@
+﻿<Window x:Class="FileMirroringTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileMirroringTool"
+        xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="900">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="SortPara" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="3">
+            <MenuItem Header="ファイル(_C)">
+                <MenuItem Header="設定の保存"/>
+                <MenuItem Header="ミラーリングの実行"/>
+            </MenuItem>
+            <MenuItem Header="ヘルプ(_H)">
+                <MenuItem Header="バージョン情報"/>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Column="1" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="Sort："></Label>
+            <TextBox Grid.Column="2"
+                     Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="バックアップ元："></Label>
+            <TextBox Grid.Column="2"
+                     Text="{Binding OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="バックアップ先："></Label>
+            <TextBox Grid.Column="2"
+                     Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" AcceptsReturn="True" ></TextBox>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="設定："></Label>
+            <Button Grid.Column="2" Content="追加" Command="{Binding MirrorListCtrlCommand}" CommandParameter="add" ></Button>
+            <Button Grid.Column="4" Content="更新" Command="{Binding MirrorListCtrlCommand}" CommandParameter="upd" ></Button>
+            <Button Grid.Column="6" Content="削除" Command="{Binding MirrorListCtrlCommand}" CommandParameter="del" ></Button>
+            <Button Grid.Column="8" Content="保存" Command="{Binding SettingCtrlCommand}" CommandParameter="save"></Button>
+            <Button Grid.Column="10" Content="再読込" Command="{Binding SettingCtrlCommand}" CommandParameter="reload"></Button>
+        </Grid>
+        <DataGrid Grid.Column="1" Grid.Row="10"
+                AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1"
+                SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
+                ItemsSource="{Binding Source={StaticResource NowDataView}}"
+                Name="MainDataGrid"
+                MouseDown="DataGrid_MouseDown">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="50" CanUserResize="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
+                <DataGridTextColumn Header="Sort" Width="50" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
+                <DataGridTextColumn Header="ミラー元" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
+                <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Column="1" Grid.Row="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="2" Content="ミラーリング実行" Command="{Binding MirroringCommand}"></Button>
+        </Grid>
+    </Grid>
+</Window>

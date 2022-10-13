@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FolderDuplicater", "FolderDuplicater\FolderDuplicater.csproj", "{D464496E-1606-46D8-A60B-48BFBF05DC06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileMirroringTool", "FileMirroringTool\FileMirroringTool.csproj", "{9596BE1C-8F5B-4F5D-91F1-0DED08558EF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D464496E-1606-46D8-A60B-48BFBF05DC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D464496E-1606-46D8-A60B-48BFBF05DC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D464496E-1606-46D8-A60B-48BFBF05DC06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9596BE1C-8F5B-4F5D-91F1-0DED08558EF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9596BE1C-8F5B-4F5D-91F1-0DED08558EF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9596BE1C-8F5B-4F5D-91F1-0DED08558EF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9596BE1C-8F5B-4F5D-91F1-0DED08558EF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
