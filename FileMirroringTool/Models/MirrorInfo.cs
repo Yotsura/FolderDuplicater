@@ -15,6 +15,10 @@ namespace FileMirroringTool.Models
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
         public string DestPathsStr { get; set; } = string.Empty;
+
+        public int FileCnt_Target { get; set; } = 0;
+        public int FileCnt_Checked { get; set; } = 0;
+
         public List<string> DestPathsList
         {
             get => DestPathsStr.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None)
@@ -50,35 +54,44 @@ namespace FileMirroringTool.Models
                 return;
             try
             {
-                foreach (var destPath in existDestPath)
+                var delList = existDestPath
+                    .Select(destPath =>
+                    (
+                        dir: destPath,
+                        files: Directory.EnumerateFiles(destPath, "*", SearchOption.AllDirectories)
+                            .OrderByDescending(x => x).ToArray()
+                    ));
+                var updList =
+                    Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
+                    .OrderByDescending(x => x).ToArray();
+                FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count();
+
+                foreach (var (dir, files) in delList)
                 {
-                    DeleteNotExistFiles(destPath);
+                    foreach (var file in files)
+                    {
+                        FileCnt_Checked++;
+                        var data = new FileData(OrigPath, dir, file, false);
+                        if (data.IsDeletedFile)
+                            data.DeleteDestFile();
+                    }
                 }
-                UpdFiles();
+
+                foreach (var destPath in DestPathsList)
+                {
+                    foreach (var file in updList)
+                    {
+                        FileCnt_Checked++;
+                        var data = new FileData(OrigPath, destPath, file, true);
+                        if (data.IsNewFile || data.IsUpdatedFile)
+                            data.DupricateFile();
+                    }
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-        }
-
-        void DeleteNotExistFiles(string destPath)
-        {
-            var delList =
-                Directory.EnumerateFiles(destPath, "*", System.IO.SearchOption.AllDirectories)
-                .Select(file => new FileData(OrigPath, destPath, file, false))
-                .Where(x => x.IsDeletedFile).OrderByDescending(x => x.DestInfo.FullName.Length).ToList();
-            delList.AsParallel().ForAll(file => file.DeleteDestFile());
-        }
-
-        void UpdFiles()
-        {
-            var allfiles =
-                Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
-                .Select(file => DestPathsList.Select(d => new FileData(OrigPath, d, file, true))
-                    .Where(x => x.IsNewFile || x.IsUpdatedFile))
-                .SelectMany(x => x).ToList();
-            allfiles.AsParallel().ForAll(file => file.DupricateFile());
         }
     }
 }
