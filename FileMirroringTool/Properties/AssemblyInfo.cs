@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("FileMirroringTool")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard Company")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("FileMirroringTool")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2022")]
+[assembly: AssemblyCopyright("Copyright © Yotsura 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
