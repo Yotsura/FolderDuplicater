@@ -64,7 +64,7 @@ namespace FileMirroringTool.Models
                 var updList =
                     Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
                     .OrderByDescending(x => x).ToArray();
-                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * DestPathsList.Count();
+                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * existDestPath.Count();
 
                 foreach (var (dir, files) in delList)
                 {
@@ -79,7 +79,7 @@ namespace FileMirroringTool.Models
                     }
                 }
 
-                foreach (var destPath in DestPathsList)
+                foreach (var destPath in existDestPath)
                 {
                     mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath}";
                     foreach (var file in updList)
