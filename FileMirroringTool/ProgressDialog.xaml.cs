@@ -60,8 +60,11 @@ namespace FileMirroringTool
 
             task.Wait();
         }
+
+        public bool IsCompleted { get; set; } = false;
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            IsCompleted = true;
             Close();
         }
 
