@@ -92,7 +92,7 @@
                         Command="{Binding SettingCtrlCommand}" CommandParameter="reload"></Button>
             </Grid>
             <DataGrid Margin="0,5,0,0" Grid.Row="5"
-                AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1"
+                AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
                 SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
                 ItemsSource="{Binding Source={StaticResource NowDataView}}"
                 Name="MainDataGrid"
