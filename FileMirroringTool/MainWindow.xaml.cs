@@ -22,8 +22,8 @@ namespace FileMirroringTool
     {
         public MainWindow()
         {
-            InitializeComponent();
             DataContext = new MainWindowViewModel();
+            InitializeComponent();
             MainDataGrid.UnselectAll();
         }
 
