@@ -6,9 +6,6 @@
         xmlns:local="clr-namespace:FileMirroringTool"
         mc:Ignorable="d"
         Title="ミラーリング実行中" Height="200" Width="500">
-    <Window.DataContext>
-        <local:MainWindowViewModel/>
-    </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
