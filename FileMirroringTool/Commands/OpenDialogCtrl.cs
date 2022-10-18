@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using FileMirroringTool.ViewModels;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Windows.Input;
 

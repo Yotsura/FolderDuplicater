@@ -5,7 +5,7 @@ using FileMirroringTool.Models;
 using FileMirroringTool.Commands;
 using System.Collections.ObjectModel;
 
-namespace FileMirroringTool
+namespace FileMirroringTool.ViewModels
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {

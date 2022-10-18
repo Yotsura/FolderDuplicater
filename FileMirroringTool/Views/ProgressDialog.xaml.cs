@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace FileMirroringTool
+namespace FileMirroringTool.Views
 {
     /// <summary>
     /// ProgressDialog.xaml の相互作用ロジック

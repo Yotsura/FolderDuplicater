@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace FileMirroringTool
+namespace FileMirroringTool.Views
 {
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
@@ -10,7 +10,7 @@ namespace FileMirroringTool
     {
         public MainWindow()
         {
-            DataContext = new MainWindowViewModel();
+            DataContext = new ViewModels.MainWindowViewModel();
             InitializeComponent();
             MainDataGrid.UnselectAll();
         }

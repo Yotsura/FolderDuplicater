@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FileMirroringTool.ViewModels;
+using FileMirroringTool.Views;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
