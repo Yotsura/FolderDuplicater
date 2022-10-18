@@ -201,10 +201,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Commands\MirrorListCtrl.cs" />
-    <Compile Include="Commands\MirroringCtrl.cs" />
-    <Compile Include="Commands\OpenDialogCtrl.cs" />
-    <Compile Include="Commands\SettingCtrl.cs" />
+    <Compile Include="ViewModels\Commands\MirrorListCtrl.cs" />
+    <Compile Include="ViewModels\Commands\MirroringCtrl.cs" />
+    <Compile Include="ViewModels\Commands\OpenDialogCtrl.cs" />
+    <Compile Include="ViewModels\Commands\SettingCtrl.cs" />
     <Compile Include="Models\FileData.cs" />
     <Compile Include="Models\MirrorInfo.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

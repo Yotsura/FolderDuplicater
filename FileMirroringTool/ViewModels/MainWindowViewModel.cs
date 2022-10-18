@@ -2,8 +2,8 @@
 using System.ComponentModel;
 using System.Windows.Input;
 using FileMirroringTool.Models;
-using FileMirroringTool.Commands;
 using System.Collections.ObjectModel;
+using FileMirroringTool.ViewModels.Commands;
 
 namespace FileMirroringTool.ViewModels
 {

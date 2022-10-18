@@ -1,9 +1,8 @@
-﻿using FileMirroringTool.ViewModels;
-using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Windows.Input;
 
-namespace FileMirroringTool.Commands
+namespace FileMirroringTool.ViewModels.Commands
 {
     internal class OpenDialogCtrl : ICommand
     {

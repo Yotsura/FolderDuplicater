@@ -10,8 +10,8 @@ namespace FileMirroringTool.Views
     {
         public MainWindow()
         {
-            DataContext = new ViewModels.MainWindowViewModel();
             InitializeComponent();
+            DataContext = new ViewModels.MainWindowViewModel();
             MainDataGrid.UnselectAll();
         }
 

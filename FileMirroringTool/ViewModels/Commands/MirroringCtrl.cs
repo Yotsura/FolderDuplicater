@@ -1,11 +1,10 @@
-﻿using FileMirroringTool.ViewModels;
-using FileMirroringTool.Views;
+﻿using FileMirroringTool.Views;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
 
-namespace FileMirroringTool.Commands
+namespace FileMirroringTool.ViewModels.Commands
 {
     internal class MirroringCtrl : ICommand
     {

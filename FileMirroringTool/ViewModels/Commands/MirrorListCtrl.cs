@@ -1,10 +1,9 @@
 ﻿using FileMirroringTool.Models;
-using FileMirroringTool.ViewModels;
 using System;
 using System.Linq;
 using System.Windows.Input;
 
-namespace FileMirroringTool.Commands
+namespace FileMirroringTool.ViewModels.Commands
 {
     internal class MirrorListCtrl : ICommand
     {
