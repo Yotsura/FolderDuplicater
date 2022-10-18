@@ -14,15 +14,12 @@ namespace FileMirroringTool.Models
         public string OrigPath { get; set; } = string.Empty;
         public string DestPathsStr { get; set; } = string.Empty;
 
-        public int FileCnt_Target { get; set; } = 0;
-        public int FileCnt_Checked { get; set; } = 0;
+        public List<string> ExistDestPathsList
+            => DestPathsStr.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None)
+                    .Where(x => !string.IsNullOrEmpty(x) && Directory.Exists(x)).ToList();
 
-        public List<string> DestPathsList
-        {
-            get => DestPathsStr.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None)
-                    .Where(x => x != string.Empty).ToList();
-            set => DestPathsStr = string.Join("\r\n", value);
-        }
+        public bool CanExecuteMirroring
+            => Directory.Exists(OrigPath) && ExistDestPathsList.Count() > 0;
 
         public override bool Equals(object obj)
         {
@@ -47,12 +44,9 @@ namespace FileMirroringTool.Models
 
         public void MirroringInvoke(MainWindowViewModel mwvm)
         {
-            var existDestPath = DestPathsList.Where(x => Directory.Exists(x)).ToList();
-            if (!Directory.Exists(OrigPath) || existDestPath.Count() < 1)
-                return;
             try
             {
-                var delList = existDestPath
+                var delList = ExistDestPathsList
                     .Select(destPath =>
                     (
                         dir: destPath,
@@ -62,7 +56,7 @@ namespace FileMirroringTool.Models
                 var updList =
                     Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
                     .OrderByDescending(x => x).ToArray();
-                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * existDestPath.Count();
+                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * ExistDestPathsList.Count();
 
                 foreach (var (dir, files) in delList)
                 {
@@ -77,7 +71,7 @@ namespace FileMirroringTool.Models
                     }
                 }
 
-                foreach (var destPath in existDestPath)
+                foreach (var destPath in ExistDestPathsList)
                 {
                     mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath}";
                     foreach (var file in updList)

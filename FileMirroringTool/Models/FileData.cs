@@ -31,8 +31,8 @@ namespace FileMirroringTool.Models
             //どちらにもあるなら更新されているか？
             if (DestInfo.Exists && OrigInfo.Exists)
                 IsUpdatedFile =
-                    DestInfo.Length != OrigInfo.Length &&
-                    DestInfo.LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc;
+                    DestInfo.LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc ||
+                    DestInfo.Length != OrigInfo.Length;
         }
 
         public void DupricateFile()

@@ -30,7 +30,7 @@ namespace FileMirroringTool.Commands
             CancellationTokenSource cancelToken = new CancellationTokenSource();
             ProgressDialog pd = new ProgressDialog(_mwvm, () =>
             {
-                _mwvm.MirrorList.Where(x => x.IsChecked)
+                _mwvm.MirrorList.Where(x => x.IsChecked && x.CanExecuteMirroring)
                     .OrderBy(x => x.SortPara)
                     .ToList().ForEach(mirror =>
                     {
