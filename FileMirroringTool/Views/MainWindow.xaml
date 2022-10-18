@@ -27,8 +27,8 @@
             </Grid.RowDefinitions>
             <Menu Grid.Row="0">
                 <MenuItem Header="ファイル(_C)">
-                    <MenuItem Header="設定の保存"/>
-                    <MenuItem Header="ミラーリングの実行"/>
+                    <MenuItem Header="設定の保存" Command="{Binding SettingCtrlCommand}" CommandParameter="save"/>
+                    <MenuItem Header="ミラーリングの実行" Command="{Binding MirroringCommand}"/>
                 </MenuItem>
                 <MenuItem Header="ヘルプ(_H)">
                     <MenuItem Header="バージョン情報"/>
