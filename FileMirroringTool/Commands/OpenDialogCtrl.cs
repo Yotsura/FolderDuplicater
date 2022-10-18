@@ -1,9 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FileMirroringTool.Commands
@@ -41,12 +37,11 @@ namespace FileMirroringTool.Commands
 
         public static string FolderDialog()
         {
-            var dlg = new CommonOpenFileDialog("IFwwwフォルダ選択")
+            var dlg = new CommonOpenFileDialog("フォルダ選択")
             {
                 IsFolderPicker = true// フォルダ選択モード。
             };
-            var ret = dlg.ShowDialog();
-            return ret == CommonFileDialogResult.Ok ? dlg.FileName : string.Empty;
+            return dlg.ShowDialog() == CommonFileDialogResult.Ok ? dlg.FileName : string.Empty;
         }
     }
 }

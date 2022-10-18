@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using FileMirroringTool.Models;
 using FileMirroringTool.Commands;
@@ -31,7 +27,9 @@ namespace FileMirroringTool
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        #endregion
 
+        #region MainWindowProps
         private string _sort = string.Empty;
         private string _origPath = string.Empty;
         private string _destPath = string.Empty;
@@ -94,8 +92,9 @@ namespace FileMirroringTool
                 OnPropertyChanged(nameof(MirrorList));
             }
         }
+        #endregion
 
-        /* progress */
+        #region ProgressDialogProps
         private double _fileCnt_Target = 0;
         private double _fileCnt_Checked = 0;
         public double FileCnt_Target
