@@ -50,7 +50,9 @@ namespace FileMirroringTool.Commands
                     System.Windows.MessageBox.Show("設定を保存しました。");
                     break;
                 case "reload":
-                    _mwvm.MirrorList = new ObservableCollection<MirrorInfo>(Settings.Default.MirrorList);
+                    while (_mwvm.MirrorList.Count > 0)
+                        _mwvm.MirrorList.RemoveAt(0);
+                    Settings.Default.MirrorList.ForEach(mirror => _mwvm.MirrorList.Add(mirror));
                     _mwvm.SelectedMirrorInfo = null;
                     System.Windows.MessageBox.Show("設定を再度読み込みました。");
                     break;
