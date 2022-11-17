@@ -95,6 +95,10 @@ namespace FileMirroringTool.ViewModels
         #endregion
 
         #region ProgressDialogProps
+        public int DelCnt { get; set; } = 0;
+        public int AddCnt { get; set; } = 0;
+        public int UpdCnt { get; set; } = 0;
+
         private double _fileCnt_Target = 0;
         private double _fileCnt_Checked = 0;
         public double FileCnt_Target

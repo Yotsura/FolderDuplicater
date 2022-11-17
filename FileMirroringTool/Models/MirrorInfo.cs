@@ -67,8 +67,9 @@ namespace FileMirroringTool.Models
                         mwvm.FileCnt_Checked++;
                         var data = new FileData(OrigPath, dir, file, false);
                         mwvm.PrgFileName = data.DestInfo.FullName;
-                        if (data.IsDeletedFile)
-                            data.DeleteDestFile();
+                        if (!data.IsDeletedFile) continue;
+                        data.DeleteDestFile();
+                        mwvm.DelCnt++;
                     }
                 }
 
@@ -80,8 +81,10 @@ namespace FileMirroringTool.Models
                         mwvm.FileCnt_Checked++;
                         var data = new FileData(OrigPath, destPath, file, true);
                         mwvm.PrgFileName = data.DestInfo.FullName;
-                        if (data.IsNewFile || data.IsUpdatedFile)
-                            data.DupricateFile();
+                        if (data.IsUpdatedFile) mwvm.UpdCnt++;
+                        else if (data.IsNewFile) mwvm.AddCnt++;
+                        else continue;
+                        data.DupricateFile();
                     }
                 }
             }

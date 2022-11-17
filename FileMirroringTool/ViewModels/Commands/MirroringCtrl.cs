@@ -41,10 +41,14 @@ namespace FileMirroringTool.ViewModels.Commands
             }, cancelToken);
 
             pd.ShowDialog();
+            var result = $"\r\n追加ファイル：{_mwvm.AddCnt}\r\n" +
+                $"更新ファイル：{_mwvm.UpdCnt}\r\n" +
+                $"削除ファイル：{_mwvm.DelCnt}\r\n";
+
             if (pd.IsCanceled || !pd.IsCompleted)
-                System.Windows.MessageBox.Show("ミラーリングが停止されました。");
+                System.Windows.MessageBox.Show("ミラーリングが停止されました。" + result);
             else
-                System.Windows.MessageBox.Show("ミラーリングが完了しました。");
+                System.Windows.MessageBox.Show("ミラーリングが完了しました。" + result);
         }
     }
 }
