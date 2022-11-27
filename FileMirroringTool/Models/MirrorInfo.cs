@@ -45,10 +45,6 @@ namespace FileMirroringTool.Models
 
         public void MirroringInvoke(MainWindowViewModel mwvm)
         {
-            mwvm.DelCnt = 0;
-            mwvm.AddCnt = 0;
-            mwvm.UpdCnt = 0;
-            mwvm.FileCnt_Checked = 0;
             try
             {
                 var delList = ExistDestPathsList

@@ -27,6 +27,11 @@ namespace FileMirroringTool.ViewModels.Commands
 
         public void Execute(object parameter)
         {
+            _mwvm.DelCnt = 0;
+            _mwvm.AddCnt = 0;
+            _mwvm.UpdCnt = 0;
+            _mwvm.FileCnt_Checked = 0;
+
             //Progressウィンドウ開く
             CancellationTokenSource cancelToken = new CancellationTokenSource();
             ProgressDialog pd = new ProgressDialog(_mwvm, () =>
