@@ -16,6 +16,8 @@ namespace FileMirroringTool.Models
         public string OrigPath { get; set; } = string.Empty;
         public string DestPathsStr { get; set; } = string.Empty;
 
+        public FileCount FileCounter { get; set; } = new FileCount();
+
         public List<string> ExistDestPathsList
             => DestPathsStr.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None)
                     .Where(x => !string.IsNullOrEmpty(x) && Directory.Exists(x)).ToList();
@@ -47,6 +49,7 @@ namespace FileMirroringTool.Models
 
         public void MirroringInvoke(MainWindowViewModel mwvm)
         {
+            FileCounter = new FileCount();
             try
             {
                 var delList = ExistDestPathsList
@@ -71,7 +74,7 @@ namespace FileMirroringTool.Models
                         mwvm.PrgFileName = data.DestInfo.FullName;
                         if (!data.IsDeletedFile) continue;
                         data.DeleteDestFile();
-                        mwvm.DelCnt++;
+                        FileCounter.DelCnt++;
                     }
                 }
 
@@ -83,8 +86,8 @@ namespace FileMirroringTool.Models
                         mwvm.FileCnt_Checked++;
                         var data = new FileData(OrigPath, destPath, file, true, SaveSpan);
                         mwvm.PrgFileName = data.DestInfo.FullName;
-                        if (data.IsUpdatedFile) mwvm.UpdCnt++;
-                        else if (data.IsNewFile) mwvm.AddCnt++;
+                        if (data.IsUpdatedFile) FileCounter.UpdCnt++;
+                        else if (data.IsNewFile) FileCounter.AddCnt++;
                         else continue;
                         data.DupricateFile();
                     }

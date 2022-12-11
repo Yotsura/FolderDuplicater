@@ -27,11 +27,8 @@ namespace FileMirroringTool.ViewModels.Commands
 
         public void Execute(object parameter)
         {
-            _mwvm.DelCnt = 0;
-            _mwvm.AddCnt = 0;
-            _mwvm.UpdCnt = 0;
             _mwvm.FileCnt_Checked = 0;
-
+            var result = string.Empty;
             //Progressウィンドウ開く
             CancellationTokenSource cancelToken = new CancellationTokenSource();
             ProgressDialog pd = new ProgressDialog(_mwvm, () =>
@@ -42,13 +39,15 @@ namespace FileMirroringTool.ViewModels.Commands
                     {
                         _mwvm.ResetPrgStat();
                         mirror.MirroringInvoke(_mwvm);
+
+                        result += $"\r\n【ID：{mirror.ID}（span：{mirror.SaveSpan}day）】" +
+                            $"追加ファイル：{mirror.FileCounter.AddCnt}／" +
+                            $"更新ファイル：{mirror.FileCounter.UpdCnt}／" +
+                            $"削除ファイル：{mirror.FileCounter.DelCnt}";
                     });
             }, cancelToken);
 
             pd.ShowDialog();
-            var result = $"\r\n追加ファイル：{_mwvm.AddCnt}\r\n" +
-                $"更新ファイル：{_mwvm.UpdCnt}\r\n" +
-                $"削除ファイル：{_mwvm.DelCnt}\r\n";
 
             if (pd.IsCanceled || !pd.IsCompleted)
                 System.Windows.MessageBox.Show("ミラーリングが停止されました。" + result);

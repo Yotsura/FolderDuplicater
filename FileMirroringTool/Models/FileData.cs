@@ -29,10 +29,10 @@ namespace FileMirroringTool.Models
             //コピー先にのみ存在するか？
             IsDeletedFile = !OrigInfo.Exists && DestInfo.Exists;
             //どちらにもあるなら更新されているか？
+            var test = DestInfo.LastWriteTimeUtc.AddDays(saveSpan);
             if (DestInfo.Exists && OrigInfo.Exists)
                 IsUpdatedFile =
-                    DestInfo.LastWriteTimeUtc.AddDays(saveSpan) < OrigInfo.LastWriteTimeUtc ||
-                    DestInfo.Length != OrigInfo.Length;
+                    DestInfo.LastWriteTimeUtc.AddDays(saveSpan) < OrigInfo.LastWriteTimeUtc;
         }
 
         public void DupricateFile()
