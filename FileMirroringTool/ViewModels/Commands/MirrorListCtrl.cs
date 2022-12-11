@@ -28,7 +28,8 @@ namespace FileMirroringTool.ViewModels.Commands
             switch (parameter.ToString())
             {
                 case "add":
-                    return _mwvm.SelectedMirrorInfo == null;
+                    return true;
+                    //return _mwvm.SelectedMirrorInfo == null;
                 case "upd":
                 case "del":
                     return _mwvm.SelectedMirrorInfo != null;
@@ -44,6 +45,7 @@ namespace FileMirroringTool.ViewModels.Commands
             {
                 ID = _mwvm.SelectedMirrorInfo?.ID ?? nextID,
                 Sort = int.TryParse(_mwvm.Sort, out var snum) ? snum : 0,
+                SaveSpan = _mwvm.SaveSpan,
                 OrigPath = _mwvm.OrigPath,
                 DestPathsStr = _mwvm.DestPath,
             };
@@ -51,6 +53,7 @@ namespace FileMirroringTool.ViewModels.Commands
             switch (parameter.ToString())
             {
                 case "add":
+                    inputdata.ID = nextID;
                     _mwvm.MirrorList.Add(inputdata);
                     _mwvm.Sort = string.Empty;
                     _mwvm.OrigPath = string.Empty;

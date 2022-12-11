@@ -11,7 +11,7 @@ namespace FileMirroringTool.Models
         public FileInfo OrigInfo { get; set; }
         public FileInfo DestInfo { get; set; }
 
-        public FileData(string origPath, string destPath, string filepath, bool isOrig)
+        public FileData(string origPath, string destPath, string filepath, bool isOrig , int saveSpan)
         {
             if (isOrig)
             {
@@ -29,9 +29,14 @@ namespace FileMirroringTool.Models
             //コピー先にのみ存在するか？
             IsDeletedFile = !OrigInfo.Exists && DestInfo.Exists;
             //どちらにもあるなら更新されているか？
+
+            var origdate = OrigInfo.LastWriteTimeUtc;
+            var destdate = DestInfo.LastWriteTimeUtc;
+            var testdate = DestInfo.LastWriteTimeUtc.AddDays(saveSpan);
+
             if (DestInfo.Exists && OrigInfo.Exists)
                 IsUpdatedFile =
-                    DestInfo.LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc ||
+                    DestInfo.LastWriteTimeUtc.AddDays(saveSpan) < OrigInfo.LastWriteTimeUtc ||
                     DestInfo.Length != OrigInfo.Length;
         }
 

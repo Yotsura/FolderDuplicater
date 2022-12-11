@@ -11,6 +11,7 @@ namespace FileMirroringTool.Models
         public int ID { get; set; } = -1;
         public int Sort { get; set; } = 0;
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
+        public int SaveSpan { get; set; } = 0; //保存周期、指定いないのファイルが有ればスキップ
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
         public string DestPathsStr { get; set; } = string.Empty;
@@ -29,6 +30,7 @@ namespace FileMirroringTool.Models
             MirrorInfo record = (MirrorInfo)obj;
             var result = ID == record.ID &&
                 Sort == record.Sort &&
+                SaveSpan == record.SaveSpan &&
                 OrigPath == record.OrigPath &&
                 DestPathsStr == record.DestPathsStr;
             return result;
@@ -36,7 +38,7 @@ namespace FileMirroringTool.Models
 
         public override int GetHashCode()
         {
-            var hashCode = ID ^ Sort
+            var hashCode = ID ^ Sort ^ SaveSpan
                 ^ OrigPath.GetHashCode()
                 ^ DestPathsStr.GetHashCode();
 
@@ -65,7 +67,7 @@ namespace FileMirroringTool.Models
                     foreach (var file in files)
                     {
                         mwvm.FileCnt_Checked++;
-                        var data = new FileData(OrigPath, dir, file, false);
+                        var data = new FileData(OrigPath, dir, file, false, SaveSpan);
                         mwvm.PrgFileName = data.DestInfo.FullName;
                         if (!data.IsDeletedFile) continue;
                         data.DeleteDestFile();
@@ -79,7 +81,7 @@ namespace FileMirroringTool.Models
                     foreach (var file in updList)
                     {
                         mwvm.FileCnt_Checked++;
-                        var data = new FileData(OrigPath, destPath, file, true);
+                        var data = new FileData(OrigPath, destPath, file, true, SaveSpan);
                         mwvm.PrgFileName = data.DestInfo.FullName;
                         if (data.IsUpdatedFile) mwvm.UpdCnt++;
                         else if (data.IsNewFile) mwvm.AddCnt++;
