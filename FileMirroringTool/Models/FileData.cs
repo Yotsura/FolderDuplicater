@@ -29,11 +29,6 @@ namespace FileMirroringTool.Models
             //コピー先にのみ存在するか？
             IsDeletedFile = !OrigInfo.Exists && DestInfo.Exists;
             //どちらにもあるなら更新されているか？
-
-            var origdate = OrigInfo.LastWriteTimeUtc;
-            var destdate = DestInfo.LastWriteTimeUtc;
-            var testdate = DestInfo.LastWriteTimeUtc.AddDays(saveSpan);
-
             if (DestInfo.Exists && OrigInfo.Exists)
                 IsUpdatedFile =
                     DestInfo.LastWriteTimeUtc.AddDays(saveSpan) < OrigInfo.LastWriteTimeUtc ||
