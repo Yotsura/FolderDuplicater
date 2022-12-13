@@ -31,7 +31,7 @@ namespace FileMirroringTool.ViewModels
 
         #region MainWindowProps
         private string _sort = string.Empty;
-        private int _saveSpan = 0;
+        private string _backupSpans = string.Empty;
         private string _origPath = string.Empty;
         private string _destPath = string.Empty;
         private MirrorInfo _selectedMirrorInfo;
@@ -47,8 +47,8 @@ namespace FileMirroringTool.ViewModels
 
                 Sort = value?.Sort.ToString() ?? string.Empty;
                 OnPropertyChanged(nameof(Sort));
-                SaveSpan = value?.SaveSpan ?? 0;
-                OnPropertyChanged(nameof(SaveSpan));
+                BackupSpans = value?.BackupSpans ?? string.Empty;
+                OnPropertyChanged(nameof(BackupSpans));
                 OrigPath = value?.OrigPath ?? string.Empty;
                 OnPropertyChanged(nameof(OrigPath));
                 DestPath = value?.DestPathsStr ?? string.Empty;
@@ -66,13 +66,13 @@ namespace FileMirroringTool.ViewModels
             }
         }
 
-        public int SaveSpan
+        public string BackupSpans
         {
-            get => _saveSpan;
+            get => _backupSpans;
             set
             {
-                _saveSpan = value;
-                OnPropertyChanged(nameof(SaveSpan));
+                _backupSpans = value;
+                OnPropertyChanged(nameof(BackupSpans));
             }
         }
 

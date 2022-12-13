@@ -11,7 +11,11 @@ namespace FileMirroringTool.Models
         public int ID { get; set; } = -1;
         public int Sort { get; set; } = 0;
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
-        public int SaveSpan { get; set; } = 0; //保存周期、指定いないのファイルが有ればスキップ
+        public string BackupSpans { get; set; } = string.Empty; //ファイルの更新周期、指定日数以内のファイルはスキップ
+
+        int[] SpanList => BackupSpans.Split(',').Select(x => int.TryParse(x, out var num) ? num : -1)
+            .Where(x => x >= 0).Distinct().ToArray();
+
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
         public string DestPathsStr { get; set; } = string.Empty;
@@ -32,7 +36,7 @@ namespace FileMirroringTool.Models
             MirrorInfo record = (MirrorInfo)obj;
             var result = ID == record.ID &&
                 Sort == record.Sort &&
-                SaveSpan == record.SaveSpan &&
+                BackupSpans == record.BackupSpans &&
                 OrigPath == record.OrigPath &&
                 DestPathsStr == record.DestPathsStr;
             return result;
@@ -40,7 +44,8 @@ namespace FileMirroringTool.Models
 
         public override int GetHashCode()
         {
-            var hashCode = ID ^ Sort ^ SaveSpan
+            var hashCode = ID ^ Sort
+                ^ BackupSpans.GetHashCode()
                 ^ OrigPath.GetHashCode()
                 ^ DestPathsStr.GetHashCode();
 
@@ -57,11 +62,12 @@ namespace FileMirroringTool.Models
                     (
                         dir: destPath,
                         files: Directory.EnumerateFiles(destPath, "*", SearchOption.AllDirectories)
-                            .OrderByDescending(x => x).ToArray()
+                            .Select(file => new FileData(OrigPath, destPath, file, false))
+                            .Where(file => file.IsDeletedFile)
+                            .ToArray()
                     ));
                 var updList =
-                    Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories)
-                    .OrderByDescending(x => x).ToArray();
+                    Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories).ToArray();
                 mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * ExistDestPathsList.Count();
 
                 foreach (var (dir, files) in delList)
@@ -70,21 +76,41 @@ namespace FileMirroringTool.Models
                     foreach (var file in files)
                     {
                         mwvm.FileCnt_Checked++;
-                        var data = new FileData(OrigPath, dir, file, false, SaveSpan);
-                        mwvm.PrgFileName = data.DestInfo.FullName;
-                        if (!data.IsDeletedFile) continue;
-                        data.DeleteDestFile();
+                        mwvm.PrgFileName = file.DestInfo.FullName;
+                        file.DeleteDestFile();
                         FileCounter.DelCnt++;
                     }
                 }
 
-                foreach (var destPath in ExistDestPathsList)
+                foreach (var destPath_orig in ExistDestPathsList)
                 {
+                    var destPath = destPath_orig;
                     mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath}";
+
                     foreach (var file in updList)
                     {
                         mwvm.FileCnt_Checked++;
-                        var data = new FileData(OrigPath, destPath, file, true, SaveSpan);
+
+                        foreach (var backupSpan in SpanList)
+                        {
+                            //同階層にバックアップ
+                            var backupData = new FileData(OrigPath, $"{OrigPath}_backup{backupSpan}", file, true);
+                            mwvm.PrgFileName = backupData.DestInfo.FullName;
+                            //追加更新は指定日数経過したもののみ反映する。
+                            if (DateTime.Now.AddDays(-backupSpan) >= backupData.OrigInfo.LastWriteTimeUtc)
+                                if (backupData.IsUpdatedFile || backupData.IsNewFile)
+                                    backupData.DupricateFile();
+
+                            //指定フォルダにもバックアップ
+                            var backupData2 = new FileData(OrigPath, $"{destPath_orig}_backup{backupSpan}", file, true);
+                            mwvm.PrgFileName = backupData2.DestInfo.FullName;
+                            //追加更新は指定日数経過したもののみ反映する。
+                            if (DateTime.Now.AddDays(-backupSpan) >= backupData2.OrigInfo.LastWriteTimeUtc)
+                                if (backupData2.IsUpdatedFile || backupData2.IsNewFile)
+                                    backupData2.DupricateFile();
+                        }
+
+                        var data = new FileData(OrigPath, destPath_orig, file, true);
                         mwvm.PrgFileName = data.DestInfo.FullName;
                         if (data.IsUpdatedFile) FileCounter.UpdCnt++;
                         else if (data.IsNewFile) FileCounter.AddCnt++;

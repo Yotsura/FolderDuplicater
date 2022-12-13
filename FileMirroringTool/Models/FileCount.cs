@@ -12,12 +12,5 @@ namespace FileMirroringTool.Models
         public int AddCnt { get; set; } = 0;
         public int UpdCnt { get; set; } = 0;
 
-        //public void ResetCnt()
-        //{
-        //    DelCnt = 0;
-        //    AddCnt = 0;
-        //    UpdCnt = 0;
-        //}
-
     }
 }

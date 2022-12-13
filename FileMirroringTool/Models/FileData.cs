@@ -5,13 +5,14 @@ namespace FileMirroringTool.Models
 {
     internal class FileData
     {
-        public bool IsNewFile { get; set; }
-        public bool IsUpdatedFile { get; set; }
-        public bool IsDeletedFile { get; set; }
+        public bool IsNewFile => OrigInfo.Exists && !DestInfo.Exists;
+        public bool IsUpdatedFile => DestInfo.Exists && OrigInfo.Exists
+            && DestInfo.LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc;
+        public bool IsDeletedFile => !OrigInfo.Exists && DestInfo.Exists;
         public FileInfo OrigInfo { get; set; }
         public FileInfo DestInfo { get; set; }
 
-        public FileData(string origPath, string destPath, string filepath, bool isOrig , int saveSpan)
+        public FileData(string origPath, string destPath, string filepath, bool isOrig)
         {
             if (isOrig)
             {
@@ -23,16 +24,6 @@ namespace FileMirroringTool.Models
                 DestInfo = new FileInfo(filepath);
                 OrigInfo = new FileInfo(DestInfo.FullName.Replace(destPath, origPath));
             }
-
-            //コピー元にのみ存在するか？
-            IsNewFile = OrigInfo.Exists && !DestInfo.Exists;
-            //コピー先にのみ存在するか？
-            IsDeletedFile = !OrigInfo.Exists && DestInfo.Exists;
-            //どちらにもあるなら更新されているか？
-            var test = DestInfo.LastWriteTimeUtc.AddDays(saveSpan);
-            if (DestInfo.Exists && OrigInfo.Exists)
-                IsUpdatedFile =
-                    DestInfo.LastWriteTimeUtc.AddDays(saveSpan) < OrigInfo.LastWriteTimeUtc;
         }
 
         public void DupricateFile()

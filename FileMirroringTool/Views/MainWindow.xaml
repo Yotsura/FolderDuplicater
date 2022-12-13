@@ -38,17 +38,16 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="110"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Sort："></Label>
                 <TextBox Margin="5,0,0,0" Grid.Column="1"
                      Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Column="3" Content="Span(day)："></Label>
-                <TextBox Margin="5,0,0,0" Grid.Column="4"
-                     Text="{Binding SaveSpan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Column="2" Content="BackupSpans(day)："></Label>
+                <TextBox Margin="5,0,0,0" Grid.Column="3" ToolTip="バックアップする場合、更新を保留する日数を「,(カンマ)」区切りで指定。"
+                     Text="{Binding BackupSpans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -114,7 +113,7 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
                     <DataGridTextColumn Header="Sort" Width="50" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Span" Width="50" CanUserResize="False" Binding="{Binding SaveSpan,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="BackupSpans" Width="100" CanUserResize="False" Binding="{Binding BackupSpans,Mode=OneWay}"/>
                     <DataGridTextColumn Header="ミラー元" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
                     <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
                 </DataGrid.Columns>
