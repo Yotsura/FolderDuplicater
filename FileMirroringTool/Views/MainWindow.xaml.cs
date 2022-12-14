@@ -15,7 +15,7 @@ namespace FileMirroringTool.Views
             MainDataGrid.UnselectAll();
         }
 
-        private void DataGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed) return;
             if (MainDataGrid.SelectedIndex > -1)
