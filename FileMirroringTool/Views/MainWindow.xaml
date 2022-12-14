@@ -39,11 +39,11 @@
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="110"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Sort："></Label>
-                <TextBox Margin="5,0,0,0" Grid.Column="1"
+                <TextBox Margin="5,0,5,0" Grid.Column="1"
                      Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <Label Grid.Column="2" Content="BackupSpans(day)："></Label>
                 <TextBox Margin="5,0,0,0" Grid.Column="3" ToolTip="バックアップする場合、更新を保留する日数を「,(カンマ)」区切りで指定。"

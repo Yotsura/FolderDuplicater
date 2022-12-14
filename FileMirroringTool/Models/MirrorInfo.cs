@@ -13,7 +13,7 @@ namespace FileMirroringTool.Models
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
         public string BackupSpans { get; set; } = string.Empty; //ファイルの更新周期、指定日数以内のファイルはスキップ
 
-        int[] SpanList => BackupSpans.Split(',').Select(x => int.TryParse(x, out var num) ? num : -1)
+        double[] SpanList => BackupSpans.Split(',').Select(x => double.TryParse(x, out var num) ? num : -1)
             .Where(x => x >= 0).Distinct().ToArray();
 
         public bool IsChecked { get; set; } = true;
@@ -97,7 +97,8 @@ namespace FileMirroringTool.Models
                             var backupData = new FileData(OrigPath, $"{OrigPath}_backup{backupSpan}", file, true);
                             mwvm.PrgFileName = backupData.DestInfo.FullName;
                             //追加更新は指定日数経過したもののみ反映する。
-                            if (DateTime.Now.AddDays(-backupSpan) >= backupData.OrigInfo.LastWriteTimeUtc)
+                            var triggerDate = DateTime.Now.AddDays(-backupSpan);
+                            if ( triggerDate >= backupData.OrigInfo.LastWriteTime)
                                 if (backupData.IsUpdatedFile || backupData.IsNewFile)
                                     backupData.DupricateFile();
 
@@ -105,7 +106,7 @@ namespace FileMirroringTool.Models
                             var backupData2 = new FileData(OrigPath, $"{destPath_orig}_backup{backupSpan}", file, true);
                             mwvm.PrgFileName = backupData2.DestInfo.FullName;
                             //追加更新は指定日数経過したもののみ反映する。
-                            if (DateTime.Now.AddDays(-backupSpan) >= backupData2.OrigInfo.LastWriteTimeUtc)
+                            if (triggerDate >= backupData2.OrigInfo.LastWriteTime)
                                 if (backupData2.IsUpdatedFile || backupData2.IsNewFile)
                                     backupData2.DupricateFile();
                         }

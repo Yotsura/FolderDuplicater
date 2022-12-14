@@ -7,7 +7,7 @@ namespace FileMirroringTool.Models
     {
         public bool IsNewFile => OrigInfo.Exists && !DestInfo.Exists;
         public bool IsUpdatedFile => DestInfo.Exists && OrigInfo.Exists
-            && DestInfo.LastWriteTimeUtc < OrigInfo.LastWriteTimeUtc;
+            && DestInfo.LastWriteTime < OrigInfo.LastWriteTime;
         public bool IsDeletedFile => !OrigInfo.Exists && DestInfo.Exists;
         public FileInfo OrigInfo { get; set; }
         public FileInfo DestInfo { get; set; }
