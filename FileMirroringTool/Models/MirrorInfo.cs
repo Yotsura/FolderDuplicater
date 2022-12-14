@@ -118,8 +118,6 @@ namespace FileMirroringTool.Models
                         else if (data.IsNewFile) FileCounter.AddCnt++;
                         else continue;
                         data.DupricateFile();
-
-                        Thread.Sleep(5000);
                     }
                 }
             }
