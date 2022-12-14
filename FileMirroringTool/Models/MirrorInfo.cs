@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace FileMirroringTool.Models
 {
@@ -52,7 +53,7 @@ namespace FileMirroringTool.Models
             return hashCode;
         }
 
-        public void MirroringInvoke(MainWindowViewModel mwvm)
+        public void MirroringInvoke(MainWindowViewModel mwvm, CancellationTokenSource token)
         {
             FileCounter = new FileCount();
             try
@@ -75,6 +76,7 @@ namespace FileMirroringTool.Models
                     mwvm.PrgTitle = $"＜削除中＞{OrigPath} -> {dir}";
                     foreach (var file in files)
                     {
+                        if (token.IsCancellationRequested) return;
                         mwvm.FileCnt_Checked++;
                         mwvm.PrgFileName = file.DestInfo.FullName;
                         file.DeleteDestFile();
@@ -89,6 +91,7 @@ namespace FileMirroringTool.Models
 
                     foreach (var file in updList)
                     {
+                        if (token.IsCancellationRequested) return;
                         mwvm.FileCnt_Checked++;
 
                         foreach (var backupSpan in SpanList)
@@ -102,7 +105,6 @@ namespace FileMirroringTool.Models
                             if (triggerTime >= backupData.OrigInfo.LastWriteTime)
                                 if (backupData.IsUpdatedFile || backupData.IsNewFile)
                                     backupData.DupricateFile();
-
                             var backupData2 = new FileData(OrigPath, $"{destPath_orig}_backup_{backupSpan}h", file, true);
                             mwvm.PrgFileName = backupData2.DestInfo.FullName;
                             if (triggerTime >= backupData2.OrigInfo.LastWriteTime)

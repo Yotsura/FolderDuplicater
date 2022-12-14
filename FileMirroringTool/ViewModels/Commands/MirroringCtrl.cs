@@ -41,7 +41,7 @@ namespace FileMirroringTool.ViewModels.Commands
                     .ToList().ForEach(mirror =>
                     {
                         _mwvm.ResetPrgStat();
-                        mirror.MirroringInvoke(_mwvm);
+                        mirror.MirroringInvoke(_mwvm, cancelToken);
 
                         result += $"\r\n【ID：{mirror.ID}（backup：{mirror.BackupSpans}）】" +
                             $"追加：{mirror.FileCounter.AddCnt}／" +
