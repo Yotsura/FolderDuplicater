@@ -59,7 +59,7 @@
                      ToolTip="＜バックアップの設定＞&#xa;
 時間を「,(カンマ)」区切りで指定してください。※少数も可&#xa;
 ミラー実行時、ミラー元及びミラー先と同階層にそれぞれ指定時間ごとのバックアップフォルダを生成します。&#xa;
-各指定時間が経過したファイルのみバックアップされます。"
+バックアップは各指定時間が経過したファイルのみ更新されます。"
                      Text="{Binding BackupSpans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileMirroringTool"
         mc:Ignorable="d" Closed="Window_Closed"
-        Title="ミラーリング実行中" Height="200" Width="500">
+        Title="ミラーリング実行中" MinHeight="250" MinWidth="500" Height="250" Width="500">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
