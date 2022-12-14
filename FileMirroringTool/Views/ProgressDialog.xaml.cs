@@ -27,7 +27,6 @@ namespace FileMirroringTool.Views
         private readonly Action _action;
 
         private readonly CancellationTokenSource _cancelToken;
-        public bool IsCanceled { get; set; } = true;
         public bool IsCompleted { get; set; } = false;
 
         private void DoWork(object sender, DoWorkEventArgs e)
@@ -42,7 +41,6 @@ namespace FileMirroringTool.Views
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsCompleted = true;
-            IsCanceled = false;
             Close();
         }
 
@@ -53,7 +51,7 @@ namespace FileMirroringTool.Views
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (IsCanceled) _cancelToken.Cancel();
+            if (!IsCompleted) _cancelToken.Cancel();
         }
     }
 }

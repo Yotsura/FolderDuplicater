@@ -33,7 +33,8 @@ namespace FileMirroringTool.ViewModels.Commands
 
             var result = string.Empty;
             //Progressウィンドウ開く
-            CancellationTokenSource cancelToken = new CancellationTokenSource();
+            var cancelTokenSource = new CancellationTokenSource();
+            var cancelToken = cancelTokenSource.Token;
             ProgressDialog pd = new ProgressDialog(_mwvm, () =>
             {
                 _mwvm.MirrorList.Where(x => x.IsChecked && x.CanExecuteMirroring)
@@ -43,19 +44,17 @@ namespace FileMirroringTool.ViewModels.Commands
                         _mwvm.ResetPrgStat();
                         mirror.MirroringInvoke(_mwvm, cancelToken);
 
-                        result += $"\r\n【ID：{mirror.ID}（backup：{mirror.BackupSpans}）】" +
-                            $"追加：{mirror.FileCounter.AddCnt}／" +
-                            $"更新：{mirror.FileCounter.UpdCnt}／" +
-                            $"削除：{mirror.FileCounter.DelCnt}";
+                        result += $"\r\n【ID：{mirror.ID}（backup：{mirror.BackupSpans}）】"
+                            + mirror.FileCounter.CntInfoStr;
+                        if (cancelToken.IsCancellationRequested) return;
                     });
-            }, cancelToken);
-
+            }, cancelTokenSource);
             pd.ShowDialog();
 
-            if (pd.IsCanceled || !pd.IsCompleted)
-                System.Windows.MessageBox.Show("ミラーリングが停止されました。" + result);
-            else
-                System.Windows.MessageBox.Show("ミラーリングが完了しました。" + result);
+            System.Windows.MessageBox.Show("ミラーリングが" +
+                (pd.IsCompleted ? "完了しました。" : "中止されました。") +
+                result);
+            cancelTokenSource.Dispose();
         }
     }
 }

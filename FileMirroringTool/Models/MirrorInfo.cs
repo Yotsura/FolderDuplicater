@@ -53,9 +53,10 @@ namespace FileMirroringTool.Models
             return hashCode;
         }
 
-        public void MirroringInvoke(MainWindowViewModel mwvm, CancellationTokenSource token)
+        public void MirroringInvoke(MainWindowViewModel mwvm, CancellationToken token)
         {
             FileCounter = new FileCount();
+            token.ThrowIfCancellationRequested();
             try
             {
                 var delList = ExistDestPathsList
@@ -76,7 +77,7 @@ namespace FileMirroringTool.Models
                     mwvm.PrgTitle = $"＜削除中＞{OrigPath} -> {dir}";
                     foreach (var file in files)
                     {
-                        if (token.IsCancellationRequested) return;
+                        token.ThrowIfCancellationRequested();
                         mwvm.FileCnt_Checked++;
                         mwvm.PrgFileName = file.DestInfo.FullName;
                         file.DeleteDestFile();
@@ -91,13 +92,12 @@ namespace FileMirroringTool.Models
 
                     foreach (var file in updList)
                     {
-                        if (token.IsCancellationRequested) return;
+                        token.ThrowIfCancellationRequested();
                         mwvm.FileCnt_Checked++;
 
                         foreach (var backupSpan in SpanList)
                         {
-                            //同階層にバックアップ
-                            //指定時間経過したもののみ反映する。
+                            //同階層にバックアップ。指定時間経過したもののみ反映する。
                             var backupData = new FileData(OrigPath, $"{OrigPath}_backup_{backupSpan}h", file, true);
                             mwvm.PrgFileName = backupData.DestInfo.FullName;
 
@@ -118,12 +118,17 @@ namespace FileMirroringTool.Models
                         else if (data.IsNewFile) FileCounter.AddCnt++;
                         else continue;
                         data.DupricateFile();
+
+                        Thread.Sleep(5000);
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                if (e is OperationCanceledException)
+                    System.Diagnostics.Debug.Print("■Mirroring was manualy stopeed.", e.Message);
+                else
+                    Console.WriteLine("Exception: " + e.GetType().Name);
             }
         }
     }

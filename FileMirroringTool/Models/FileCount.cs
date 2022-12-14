@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FileMirroringTool.Models
+﻿namespace FileMirroringTool.Models
 {
     public class FileCount
     {
         public int DelCnt { get; set; } = 0;
         public int AddCnt { get; set; } = 0;
         public int UpdCnt { get; set; } = 0;
-
+        public string CntInfoStr => $"追加：{AddCnt}／更新：{UpdCnt}／削除：{DelCnt}";
     }
 }
