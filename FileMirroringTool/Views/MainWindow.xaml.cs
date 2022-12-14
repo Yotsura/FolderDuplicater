@@ -21,5 +21,25 @@ namespace FileMirroringTool.Views
             if (MainDataGrid.SelectedIndex > -1)
                 MainDataGrid.UnselectAll();
         }
+
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            //数値のみ許可
+            e.Handled = new System.Text.RegularExpressions.Regex("[^0-9]+").IsMatch(e.Text);
+        }
+        private void TextBox_PreviewTextInput2(object sender, TextCompositionEventArgs e)
+        {
+            //数値とカンマを許可
+            e.Handled = new System.Text.RegularExpressions.Regex(@"([^0-9|\,|\.])+").IsMatch(e.Text);
+        }
+
+        private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            // 貼り付けを禁止します。
+            if (e.Command == ApplicationCommands.Paste)
+            {
+                e.Handled = true;
+            }
+        }
     }
 }

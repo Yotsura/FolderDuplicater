@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FileMirroringTool"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d" MouseDown="Window_MouseDown"
-        Title="MainWindow" Height="500" Width="900">
+        Title="MirroringTool" Height="500" Width="900">
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
             <CollectionViewSource.SortDescriptions>
@@ -38,15 +38,28 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="120"/>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Sort："></Label>
                 <TextBox Margin="5,0,5,0" Grid.Column="1"
+                     InputMethod.IsInputMethodEnabled="False"
+                     PreviewTextInput="TextBox_PreviewTextInput"
+                     CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
+                     ToolTipService.ShowDuration="10000000"
+                     ToolTip="処理順を設定します。数値が大きいほど先に処理されます。"
                      Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Column="2" Content="BackupSpans(day)："></Label>
-                <TextBox Margin="5,0,0,0" Grid.Column="3" ToolTip="バックアップする場合、更新を保留する日数を「,(カンマ)」区切りで指定。"
+                <Label Grid.Column="2" Content="Backup(hour)："></Label>
+                <TextBox Margin="5,0,0,0" Grid.Column="3"
+                     InputMethod.IsInputMethodEnabled="False"
+                     PreviewTextInput="TextBox_PreviewTextInput2"
+                     CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
+                     ToolTipService.ShowDuration="10000000"
+                     ToolTip="＜バックアップの設定＞&#xa;
+時間を「,(カンマ)」区切りで指定してください。※少数も可&#xa;
+ミラー実行時、ミラー元及びミラー先と同階層にそれぞれ指定時間ごとのバックアップフォルダを生成します。&#xa;
+各指定時間が経過したファイルのみバックアップされます。"
                      Text="{Binding BackupSpans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">
@@ -71,8 +84,8 @@
                 <TextBox Margin="5,0,0,0" Grid.Column="1"
                      Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" AcceptsReturn="True" ></TextBox>
-                <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26"
-                        Command="{Binding OpenDialogCommand}" CommandParameter="dest" ></Button>
+                <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26" 
+                        Command="{Binding OpenDialogCommand}" CommandParameter="dest" VerticalAlignment="Bottom" ></Button>
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="4">
                 <Grid.ColumnDefinitions>
@@ -112,7 +125,7 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
                     <DataGridTextColumn Header="Sort" Width="50" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="BackupSpans" Width="100" CanUserResize="False" Binding="{Binding BackupSpans,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="Backup" Width="100" CanUserResize="False" Binding="{Binding BackupSpans,Mode=OneWay}"/>
                     <DataGridTextColumn Header="ミラー元" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
                     <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
                 </DataGrid.Columns>

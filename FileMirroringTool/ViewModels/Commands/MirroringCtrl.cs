@@ -43,7 +43,7 @@ namespace FileMirroringTool.ViewModels.Commands
                         _mwvm.ResetPrgStat();
                         mirror.MirroringInvoke(_mwvm);
 
-                        result += $"\r\n【ID：{mirror.ID}（backupday：{mirror.BackupSpans}）】" +
+                        result += $"\r\n【ID：{mirror.ID}（backup：{mirror.BackupSpans}）】" +
                             $"追加：{mirror.FileCounter.AddCnt}／" +
                             $"更新：{mirror.FileCounter.UpdCnt}／" +
                             $"削除：{mirror.FileCounter.DelCnt}";
