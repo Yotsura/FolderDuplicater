@@ -134,15 +134,26 @@
             <Grid Margin="0,5,0,0" Grid.Row="6">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="60"/>
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="1" Content="ミラーリング："></Label>
-                <Button Grid.Column="2" Content="1時間ごとに自動実行"
+                <Label Grid.Column="1" Content="AutomationInverval："></Label>
+                <TextBox Grid.Column="2"
+                     InputMethod.IsInputMethodEnabled="False"
+                     PreviewTextInput="TextBox_PreviewTextInput3"
+                     CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
+                     ToolTipService.ShowDuration="10000000"
+                     ToolTip="自動実行するインターバルを設定します。"
+                     Text="{Binding AutoIntervalStr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Column="3" Content="hours"></Label>
+                
+                <Button Grid.Column="4" Content="指定時間毎に自動実行"
                         Command="{Binding MirroringCommand}"
                         CommandParameter="auto"></Button>
-                <Button Grid.Column="3" Content="手動で実行"
+                <Button Grid.Column="5" Content="手動で実行"
                         Command="{Binding MirroringCommand}"
                         CommandParameter="manual"></Button>
             </Grid>

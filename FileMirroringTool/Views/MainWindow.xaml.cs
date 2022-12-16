@@ -33,6 +33,11 @@ namespace FileMirroringTool.Views
             //数値とカンマを許可
             e.Handled = new Regex(@"([^0-9|\,|\.])+").IsMatch(e.Text);
         }
+        private void TextBox_PreviewTextInput3(object sender, TextCompositionEventArgs e)
+        {
+            //数値と小数を許可
+            e.Handled = new Regex(@"([^0-9|\.])+").IsMatch(e.Text);
+        }
 
         private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
         {

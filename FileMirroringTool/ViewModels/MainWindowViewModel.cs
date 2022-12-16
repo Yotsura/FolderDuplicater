@@ -36,6 +36,7 @@ namespace FileMirroringTool.ViewModels
         private string _destPath = string.Empty;
         private MirrorInfo _selectedMirrorInfo;
         private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>();
+        private string _autoIntervalStr = Settings.Default.AutomationIntervalStr;
 
         public MirrorInfo SelectedMirrorInfo
         {
@@ -103,6 +104,25 @@ namespace FileMirroringTool.ViewModels
             {
                 _mirrorList = value;
                 OnPropertyChanged(nameof(MirrorList));
+            }
+        }
+
+        public string AutoIntervalStr
+        {
+            get => _autoIntervalStr;
+            set
+            {
+                _autoIntervalStr = value;
+                OnPropertyChanged(nameof(AutoIntervalStr));
+            }
+        }
+        public double AutoInterval
+        {
+            get => double.TryParse(_autoIntervalStr, out var num) ? num : 1;
+            set
+            {
+                AutoIntervalStr = value.ToString();
+                OnPropertyChanged(nameof(AutoIntervalStr));
             }
         }
         #endregion

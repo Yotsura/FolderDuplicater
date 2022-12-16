@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileMirroringTool.ViewModels;
+using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace FileMirroringTool.Views
     /// </summary>
     public partial class ProgressDialog : Window
     {
-        public ProgressDialog(object context, Action action, CancellationTokenSource cancelToken,bool isAuto)
+        public ProgressDialog(MainWindowViewModel context, Action action, CancellationTokenSource cancelToken,bool isAuto)
         {
             InitializeComponent();
             DataContext = context;
@@ -24,6 +25,7 @@ namespace FileMirroringTool.Views
                 _worker.DoWork += DoWork;
             if (!isAuto)
                 _worker.RunWorkerCompleted += RunWorkerCompleted;
+            _timer = new System.Timers.Timer(TimeSpan.FromHours(context.AutoInterval).TotalMilliseconds);
             _worker.RunWorkerAsync();
         }
 
