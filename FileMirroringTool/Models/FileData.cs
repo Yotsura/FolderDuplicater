@@ -9,7 +9,13 @@ namespace FileMirroringTool.Models
         public bool IsUpdatedFile => DestInfo.Exists && OrigInfo.Exists
             && DestInfo.LastWriteTime < OrigInfo.LastWriteTime;
         public bool IsDeletedFile => !OrigInfo.Exists && DestInfo.Exists;
+        /// <summary>
+        /// ミラー元ファイル
+        /// </summary>
         public FileInfo OrigInfo { get; set; }
+        /// <summary>
+        /// ミラー先ファイル
+        /// </summary>
         public FileInfo DestInfo { get; set; }
 
         public FileData(string origPath, string destPath, string filepath, bool isOrig)

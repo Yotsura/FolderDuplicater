@@ -97,14 +97,15 @@ namespace FileMirroringTool.Models
 
                         foreach (var backupSpan in SpanList)
                         {
-                            //同階層にバックアップ。指定時間経過したもののみ更新する。追加は即座にする。
+                            //同階層にバックアップ。追加は即座にする。
+                            //前回の更新時間から指定時間経過したもののみ更新する。
                             var backupData = new FileData(OrigPath, $"{OrigPath}_backup_{backupSpan}h", file, true);
                             mwvm.PrgFileName = backupData.DestInfo.FullName;
                             var triggerTime = DateTime.Now.AddHours(-backupSpan);
                             if (backupData.IsNewFile)
                                 backupData.DupricateFile();
                             else if (backupData.IsUpdatedFile
-                                && triggerTime >= backupData.OrigInfo.LastWriteTime)
+                                && triggerTime >= backupData.DestInfo.LastWriteTime)
                                 backupData.DupricateFile();
 
                             var backupData2 = new FileData(OrigPath, $"{destPath_orig}_backup_{backupSpan}h", file, true);
@@ -112,7 +113,7 @@ namespace FileMirroringTool.Models
                             if (backupData2.IsNewFile)
                                 backupData2.DupricateFile();
                             else if (backupData2.IsUpdatedFile
-                                && triggerTime >= backupData2.OrigInfo.LastWriteTime)
+                                && triggerTime >= backupData2.DestInfo.LastWriteTime)
                                 backupData2.DupricateFile();
                         }
 
