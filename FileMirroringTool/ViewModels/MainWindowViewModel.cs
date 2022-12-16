@@ -118,6 +118,7 @@ namespace FileMirroringTool.ViewModels
                 _fileCnt_Target = value;
                 PrgVal = (int)Math.Floor(100 * (_fileCnt_Checked / _fileCnt_Target));
                 PrgStr = $"{_fileCnt_Checked}/{_fileCnt_Target}";
+                OnPropertyChanged(nameof(IsPrepareing));
             }
         }
 
@@ -153,7 +154,7 @@ namespace FileMirroringTool.ViewModels
             }
         }
 
-        private string _prgTitle = "＜作業内容＞ファイル名";
+        private string _prgTitle = "＜データチェック中＞";
         public string PrgTitle
         {
             get => _prgTitle;
@@ -175,11 +176,14 @@ namespace FileMirroringTool.ViewModels
             }
         }
 
+        public bool IsAutoMirror = false;
+        public bool IsPrepareing => IsAutoMirror || FileCnt_Target < 1;
+
         public void ResetPrgStat()
         {
             FileCnt_Target = 0;
             FileCnt_Checked = 0;
-            PrgTitle = "＜リスト作成中＞";
+            PrgTitle = "＜データチェック中＞";
             PrgFileName = string.Empty;
         }
         #endregion

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileMirroringTool"
-        mc:Ignorable="d" Closed="Window_Closed"
+        mc:Ignorable="d" Closing="Window_Closing"
         Title="ミラーリング実行中" MinHeight="250" MinWidth="500" Height="250" Width="500">
     <Grid>
         <Grid.RowDefinitions>
@@ -16,7 +16,9 @@
         <TextBlock Grid.Row="0" Margin="10" Text="{Binding PrgTitle}"
                    TextAlignment="Left" VerticalAlignment="Top" TextWrapping="WrapWithOverflow"/>
         <Grid Grid.Row="1" Margin="5">
-            <ProgressBar Minimum="0" Maximum="100" Value="{Binding PrgVal}"/>
+            <ProgressBar Minimum="0" Maximum="100"
+                         Value="{Binding PrgVal}"
+                         IsIndeterminate="{Binding IsPrepareing}"/>
             <TextBlock Text="{Binding PrgStr}" TextAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         <TextBlock Grid.Row="2" Margin="5" Text="{Binding PrgFileName}"

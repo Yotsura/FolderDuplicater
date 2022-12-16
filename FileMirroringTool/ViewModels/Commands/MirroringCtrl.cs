@@ -1,14 +1,18 @@
-﻿using FileMirroringTool.Views;
+﻿using FileMirroringTool.Models;
+using FileMirroringTool.Views;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows.Input;
-
 namespace FileMirroringTool.ViewModels.Commands
 {
     internal class MirroringCtrl : ICommand
     {
         readonly MainWindowViewModel _mwvm;
+        List<MirrorInfo> MirrorList
+            => _mwvm.MirrorList.Where(x => x.IsChecked && x.CanExecuteMirroring)
+                    .OrderBy(x => x.SortPara).ToList();
         public MirroringCtrl(MainWindowViewModel mwvm)
         {
             _mwvm = mwvm;
@@ -31,30 +35,70 @@ namespace FileMirroringTool.ViewModels.Commands
             Settings.Default.MirrorList = _mwvm.MirrorList.ToList();
             Settings.Default.Save();
 
+            _mwvm.IsAutoMirror = parameter.ToString() == "auto";
+            if (_mwvm.IsAutoMirror)
+                AutoMirror();
+            else
+                ManualMirror();
+        }
+
+        void ManualMirror()
+        {
             var result = string.Empty;
-            //Progressウィンドウ開く
             var cancelTokenSource = new CancellationTokenSource();
             var cancelToken = cancelTokenSource.Token;
-            ProgressDialog pd = new ProgressDialog(_mwvm, () =>
+            var pd = new ProgressDialog(_mwvm, () =>
             {
-                _mwvm.MirrorList.Where(x => x.IsChecked && x.CanExecuteMirroring)
-                    .OrderBy(x => x.SortPara)
-                    .ToList().ForEach(mirror =>
-                    {
-                        _mwvm.ResetPrgStat();
-                        mirror.MirroringInvoke(_mwvm, cancelToken);
+                MirrorList.ForEach(mirror =>
+                {
+                    _mwvm.ResetPrgStat();
+                    mirror.MirroringInvoke(_mwvm, cancelToken);
+                    result += $"\r\n【ID：{mirror.ID}（backup：{mirror.BackupSpans}）】"
+                        + mirror.FileCounter.CntInfoStr;
+                    _mwvm.ResetPrgStat();
 
-                        result += $"\r\n【ID：{mirror.ID}（backup：{mirror.BackupSpans}）】"
-                            + mirror.FileCounter.CntInfoStr;
-                        if (cancelToken.IsCancellationRequested) return;
-                    });
-            }, cancelTokenSource);
+                    if (cancelToken.IsCancellationRequested) return;
+                });
+            }, cancelTokenSource, false);
             pd.ShowDialog();
 
             System.Windows.MessageBox.Show("ミラーリングが" +
                 (pd.IsCompleted ? "完了しました。" : "中止されました。") +
                 result);
             cancelTokenSource.Dispose();
+
+        }
+
+        void AutoMirror()
+        {
+            var cancelTokenSource = new CancellationTokenSource();
+            var cancelToken = cancelTokenSource.Token;
+            var runCnt = 0;
+            var lastRunTime = DateTime.Now;
+            var pd = new ProgressDialog(_mwvm, () =>
+            {
+                if (cancelToken.IsCancellationRequested) return;
+                lastRunTime = DateTime.Now;
+                runCnt++;
+                MirrorList.ForEach(mirror =>
+                {
+                    _mwvm.ResetPrgStat();
+                    if (cancelToken.IsCancellationRequested) return;
+                    mirror.MirroringInvoke(_mwvm, cancelToken);
+                    if (cancelToken.IsCancellationRequested) return;
+                });
+                _mwvm.ResetPrgStat();
+                _mwvm.PrgTitle = $"＜待機中＞次回実行時刻：{lastRunTime.AddHours(1).ToString("HH:mm:ss")}";
+            }, cancelTokenSource, true);
+
+            pd.Closed += (e, s) =>
+            {
+                System.Windows.MessageBox.Show("自動ミラーリングが停止されました。"
+                    + $"\r\n実行回数：{runCnt}"
+                    + $"\r\n最後の実行：{(runCnt > 0 ? lastRunTime.ToString("HH:mm:ss") : string.Empty)}");
+                cancelTokenSource.Dispose();
+            };
+            pd.ShowDialog();
         }
     }
 }
