@@ -195,9 +195,8 @@ namespace FileMirroringTool.ViewModels
                 OnPropertyChanged(nameof(PrgFileName));
             }
         }
-
-        public bool IsAutoMirror = false;
-        public bool IsPrepareing => IsAutoMirror || FileCnt_Target < 1;
+        
+        public bool IsPrepareing => FileCnt_Target < 1;
 
         public void ResetPrgStat()
         {
