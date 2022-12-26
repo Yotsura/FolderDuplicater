@@ -45,7 +45,7 @@ namespace FileMirroringTool.ViewModels.Commands
             {
                 ID = _mwvm.SelectedMirrorInfo?.ID ?? nextID,
                 Sort = int.TryParse(_mwvm.Sort, out var snum) ? snum : 0,
-                BackupSpans = _mwvm.BackupSpans,
+                NeedBackup = _mwvm.NeedBackup,
                 OrigPath = _mwvm.OrigPath,
                 DestPathsStr = _mwvm.DestPath,
             };

@@ -12,10 +12,12 @@ namespace FileMirroringTool.Models
         public int ID { get; set; } = -1;
         public int Sort { get; set; } = 0;
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
-        public string BackupSpans { get; set; } = string.Empty; //ファイルの更新周期、指定日数以内のファイルはスキップ
+        //public string BackupSpans { get; set; } = string.Empty; //ファイルの更新周期、指定日数以内のファイルはスキップ
 
-        double[] SpanList => BackupSpans.Split(',').Select(x => double.TryParse(x, out var num) ? num : -1)
-            .Where(x => x >= 0).Distinct().ToArray();
+        //double[] SpanList => BackupSpans.Split(',').Select(x => double.TryParse(x, out var num) ? num : -1)
+        //    .Where(x => x >= 0).Distinct().ToArray();
+        public bool NeedBackup { get; set; } = false;
+        public string BackupMode => NeedBackup ? "ON" : "OFF";
 
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
@@ -37,7 +39,8 @@ namespace FileMirroringTool.Models
             MirrorInfo record = (MirrorInfo)obj;
             var result = ID == record.ID &&
                 Sort == record.Sort &&
-                BackupSpans == record.BackupSpans &&
+                BackupMode == record.BackupMode &&
+                //BackupSpans == record.BackupSpans &&
                 OrigPath == record.OrigPath &&
                 DestPathsStr == record.DestPathsStr;
             return result;
@@ -46,7 +49,8 @@ namespace FileMirroringTool.Models
         public override int GetHashCode()
         {
             var hashCode = ID ^ Sort
-                ^ BackupSpans.GetHashCode()
+                ^ BackupMode.GetHashCode()
+                //^ BackupSpans.GetHashCode()
                 ^ OrigPath.GetHashCode()
                 ^ DestPathsStr.GetHashCode();
 
@@ -94,28 +98,6 @@ namespace FileMirroringTool.Models
                     {
                         token.ThrowIfCancellationRequested();
                         mwvm.FileCnt_Checked++;
-
-                        foreach (var backupSpan in SpanList)
-                        {
-                            //同階層にバックアップ。追加は即座にする。
-                            //前回の更新時間から指定時間経過したもののみ更新する。
-                            var backupData = new FileData(OrigPath, $"{OrigPath}_backup_{backupSpan}h", file, true);
-                            mwvm.PrgFileName = backupData.DestInfo.FullName;
-                            var triggerTime = DateTime.Now.AddHours(-backupSpan);
-                            if (backupData.IsNewFile)
-                                backupData.DupricateFile();
-                            else if (backupData.IsUpdatedFile
-                                && triggerTime >= backupData.DestInfo.LastWriteTime)
-                                backupData.DupricateFile();
-
-                            var backupData2 = new FileData(OrigPath, $"{destPath_orig}_backup_{backupSpan}h", file, true);
-                            mwvm.PrgFileName = backupData2.DestInfo.FullName;
-                            if (backupData2.IsNewFile)
-                                backupData2.DupricateFile();
-                            else if (backupData2.IsUpdatedFile
-                                && triggerTime >= backupData2.DestInfo.LastWriteTime)
-                                backupData2.DupricateFile();
-                        }
 
                         var data = new FileData(OrigPath, destPath_orig, file, true);
                         mwvm.PrgFileName = data.DestInfo.FullName;

@@ -50,17 +50,12 @@
                      ToolTipService.ShowDuration="10000000"
                      ToolTip="処理順を設定します。数値が大きいほど先に処理されます。"
                      Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Column="2" Content="Backup(hour)："></Label>
-                <TextBox Margin="5,0,0,0" Grid.Column="3"
-                     InputMethod.IsInputMethodEnabled="False"
-                     PreviewTextInput="TextBox_PreviewTextInput2"
-                     CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
-                     ToolTipService.ShowDuration="10000000"
-                     ToolTip="＜バックアップの設定＞&#xa;
-時間を「,(カンマ)」区切りで指定してください。※少数も可&#xa;
-ミラー実行時、ミラー元及びミラー先と同階層にそれぞれ指定時間ごとのバックアップフォルダを生成します。&#xa;
-バックアップは各指定時間が経過したファイルのみ更新されます。"
-                     Text="{Binding BackupSpans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <Label Grid.Column="2" Content="BackupMode："></Label>
+
+                <CheckBox Margin="5,0,0,0" Grid.Column="3"
+                        ToolTip="差分バックアップを作成します。&#xa;1h以内：15mごと&#xa;48h以内：1hごと&#xa;7day以内：1dayごと"
+                        IsChecked="{Binding NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -125,7 +120,7 @@
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
                     <DataGridTextColumn Header="Sort" Width="50" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Backup" Width="100" CanUserResize="False" Binding="{Binding BackupSpans,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="BackupMode" Width="100" CanUserResize="False" Binding="{Binding BackupMode,Mode=OneWay}"/>
                     <DataGridTextColumn Header="ミラー元" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
                     <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
                 </DataGrid.Columns>
