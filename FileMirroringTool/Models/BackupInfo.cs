@@ -66,7 +66,7 @@ namespace FileMirroringTool.Models
         {
             TargetDir = new DirectoryInfo(targetDirPath);
             TargetFile = new FileInfo(targetFilePath);
-            HourBackupDirs = Enumerable.Range(1, 3).Select(x => x * 0.25)
+            HourBackupDirs = Enumerable.Range(0, 4).Select(x => x * 0.25)
                 .Concat(Enumerable.Range(1, 48).Select(x => (double)x))
                 .Concat(Enumerable.Range(3, 5).Select(x => (double)x * 24))
                 .Select(x => new BackupDirectoryInfo(TargetDir, x))
