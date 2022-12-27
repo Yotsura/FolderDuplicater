@@ -71,7 +71,6 @@ namespace FileMirroringTool.ViewModels
                 OnPropertyChanged(nameof(BackUpFileList));
             }
         }
-        public string SelectedBackupFileFullName => SelectedBackupFile?.FullName ?? string.Empty;
         public FileInfo SelectedBackupFile
         {
             get => _selectedBackupFile;
@@ -79,7 +78,6 @@ namespace FileMirroringTool.ViewModels
             {
                 _selectedBackupFile = value;
                 OnPropertyChanged(nameof(SelectedBackupFile));
-                OnPropertyChanged(nameof(SelectedBackupFileFullName));
             }
         }
 

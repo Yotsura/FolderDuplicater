@@ -220,6 +220,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SettingsAdditional.cs" />
+    <Compile Include="Views\ValueConverter\DateConverter.cs" />
+    <Compile Include="Views\ValueConverter\FileInfoConverter.cs" />
+    <Compile Include="Views\ValueConverter\FileNameConverter.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
