@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FileMirroringTool.Models
 {
-    internal class BackupInfo
+    public class BackupInfo
     {
         public string TargetDirectory { get; set; } = string.Empty;
         public BackupFile[] FileInfos { get; set; }
@@ -14,6 +14,9 @@ namespace FileMirroringTool.Models
         {
             TargetDirectory = targetDirectory;
 
+            if (string.IsNullOrEmpty(targetDirectory)) return;
+            var dir = new DirectoryInfo(targetDirectory);
+            if (!dir.Exists) return;
             FileInfos =
                 Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories)
                 .Where(file =>
@@ -114,9 +117,7 @@ namespace FileMirroringTool.Models
             //新規バックアップの作成
             var orig_span = runTime - TargetFile.LastWriteTime;
 
-            //前回から１時間以内の場合は更新しない？
             //最終的な更新日時が変わっていなければ更新は不要
-
             var newBackupFile = GetBacnUpFIleInfo(GetBackupDirectory(orig_span));
             if (newBackupFile == null) return;
 

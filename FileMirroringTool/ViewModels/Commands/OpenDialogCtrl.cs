@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Windows.Input;
 
@@ -18,21 +19,45 @@ namespace FileMirroringTool.ViewModels.Commands
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public bool CanExecute(object parameter) => true;
-
-        public void Execute(object parameter)
+        public bool CanExecute(object parameter)
         {
-            var path = FolderDialog();
-            if (string.IsNullOrEmpty(path)) return;
             switch (parameter.ToString())
             {
                 case "orig":
-                    _mwvm.OrigPath = path;
+                case "dest":
+                    return true;
+                case "backup":
+                    var selectedOrigPath = _mwvm.SelectedMirrorInfo?.OrigPath ?? string.Empty;
+                    return !string.IsNullOrEmpty(selectedOrigPath)
+                        && new System.IO.DirectoryInfo(selectedOrigPath).Exists;
+                default: return false;
+            }
+        }
+
+        public void Execute(object parameter)
+        {
+            var para = parameter.ToString();
+            switch (para)
+            {
+                case "orig":
+                    _mwvm.OrigPath = FolderDialog();
                     break;
                 case "dest":
-                    _mwvm.DestPath += (string.IsNullOrEmpty(_mwvm.DestPath) ? string.Empty : "\n") + path;
+                    _mwvm.DestPath += (string.IsNullOrEmpty(_mwvm.DestPath) ? string.Empty : "\n") + FolderDialog();
+                    break;
+                case "backup":
+                    _mwvm.SearchFile = FileDialog(_mwvm.OrigPath);
                     break;
             }
+        }
+
+        public static string FileDialog(string iniPath)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.InitialDirectory = iniPath;
+            dialog.Filter = "すべてのファイル(*.*)|*.*";
+            dialog.FilterIndex = 2;
+            return dialog.ShowDialog() == true ? dialog.FileName : string.Empty;
         }
 
         public static string FolderDialog()

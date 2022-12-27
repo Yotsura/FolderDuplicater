@@ -206,6 +206,7 @@
     <Compile Include="ViewModels\Commands\MirrorListCtrl.cs" />
     <Compile Include="ViewModels\Commands\MirroringCtrl.cs" />
     <Compile Include="ViewModels\Commands\OpenDialogCtrl.cs" />
+    <Compile Include="ViewModels\Commands\OpenExplorer.cs" />
     <Compile Include="ViewModels\Commands\SettingCtrl.cs" />
     <Compile Include="Models\FileData.cs" />
     <Compile Include="Models\MirrorInfo.cs" />
@@ -219,6 +220,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SettingsAdditional.cs" />
+    <Compile Include="Views\ValueConverter\DateConverter.cs" />
+    <Compile Include="Views\ValueConverter\FileInfoConverter.cs" />
+    <Compile Include="Views\ValueConverter\FileNameConverter.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

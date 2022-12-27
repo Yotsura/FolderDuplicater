@@ -51,10 +51,6 @@ namespace FileMirroringTool.ViewModels.Commands
                 MirrorList.ForEach(mirror =>
                 {
                     _mwvm.ResetPrgStat();
-
-                    if (mirror.NeedBackup)
-                        new BackupInfo(mirror.OrigPath).RunAllBackup();
-
                     mirror.MirroringInvoke(_mwvm, cancelToken);
                     result += $"\r\n【ID：{mirror.ID}（backup：{(mirror.NeedBackup ? "on" : "off")}）】"
                         + mirror.FileCounter.CntInfoStr;
@@ -90,8 +86,6 @@ namespace FileMirroringTool.ViewModels.Commands
                 MirrorList.ForEach(mirror =>
                 {
                     _mwvm.ResetPrgStat();
-                    if (mirror.NeedBackup)
-                        new BackupInfo(mirror.OrigPath).RunAllBackup();
                     if (cancelToken.IsCancellationRequested) return;
                     mirror.MirroringInvoke(_mwvm, cancelToken);
                     if (cancelToken.IsCancellationRequested) return;
