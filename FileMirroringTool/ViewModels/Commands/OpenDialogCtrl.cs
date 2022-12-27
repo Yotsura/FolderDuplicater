@@ -30,7 +30,6 @@ namespace FileMirroringTool.ViewModels.Commands
                     var selectedOrigPath = _mwvm.SelectedMirrorInfo?.OrigPath ?? string.Empty;
                     return !string.IsNullOrEmpty(selectedOrigPath)
                         && new System.IO.DirectoryInfo(selectedOrigPath).Exists;
-                    //return true;
                 default: return false;
             }
         }

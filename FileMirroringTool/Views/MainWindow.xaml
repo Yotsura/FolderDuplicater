@@ -86,6 +86,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Grid.Row="0" Content="Backup："></Label>
+                <!--<Button Margin="5,0,0,0" Grid.Column="0" Grid.Row="1" Content="test" Height="26" 
+                     Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding SearchFile}" VerticalAlignment="Bottom" ></Button>-->
                 <Grid Grid.Column="1" Grid.Row="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
@@ -111,20 +113,17 @@
                             Command="{Binding OpenDialogCommand}" CommandParameter="backup" VerticalAlignment="Bottom" ></Button>
                     </Grid>
                     <DataGrid Margin="0,5,0,0" Grid.Row="2"
-                    AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
-                    SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
-                    ItemsSource="{Binding Source={StaticResource NowDataView2}}">
+                        AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
+                        SelectedItem="{Binding SelectedBackupFile, Mode=TwoWay}"
+                        ItemsSource="{Binding Source={StaticResource NowDataView2}}">
+                        <DataGrid.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick"
+                                  Command="{Binding OpenExplorerCommand}"
+                                  CommandParameter="{Binding SelectedBackupFileFullName}"/>
+                        </DataGrid.InputBindings>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="LastWriteTime" Width="120" CanUserResize="False" Binding="{Binding LastWriteTime,Mode=OneWay}"/>
+                            <DataGridTextColumn Header="LastWriteTime" Width="140" CanUserResize="False" Binding="{Binding LastWriteTime,Mode=OneWay}"/>
                             <DataGridTextColumn Header="Path" Width="*" CanUserResize="False" Binding="{Binding FullName,Mode=OneWay}"/>
-                            <DataGridTemplateColumn IsReadOnly="True" Header="" Width="100" CanUserResize="False">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Height="26" Content="Explorerで開く"
-                                                Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding FullName}" ></Button>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

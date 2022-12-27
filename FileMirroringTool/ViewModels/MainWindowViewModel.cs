@@ -43,6 +43,7 @@ namespace FileMirroringTool.ViewModels
         private string _autoIntervalStr = Settings.Default.AutomationIntervalStr;
 
         private string _searchFile = string.Empty;
+        private FileInfo _selectedBackupFile;
         private ObservableCollection<FileInfo> _backUpFileList = new ObservableCollection<FileInfo>();
         public string SearchFile
         {
@@ -68,6 +69,17 @@ namespace FileMirroringTool.ViewModels
             {
                 _backUpFileList = value;
                 OnPropertyChanged(nameof(BackUpFileList));
+            }
+        }
+        public string SelectedBackupFileFullName => SelectedBackupFile?.FullName ?? string.Empty;
+        public FileInfo SelectedBackupFile
+        {
+            get => _selectedBackupFile;
+            set
+            {
+                _selectedBackupFile = value;
+                OnPropertyChanged(nameof(SelectedBackupFile));
+                OnPropertyChanged(nameof(SelectedBackupFileFullName));
             }
         }
 

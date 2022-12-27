@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Input;
 
 namespace FileMirroringTool.ViewModels.Commands
@@ -20,15 +21,15 @@ namespace FileMirroringTool.ViewModels.Commands
 
         public bool CanExecute(object parameter)
         {
-            //var path = parameter as string;
-            //return !string.IsNullOrEmpty(path) && new System.IO.FileInfo(path).Exists;
-            return true;
+            var path = parameter as string;
+            return !string.IsNullOrEmpty(path) && new FileInfo(path).Exists;
         }
 
         public void Execute(object parameter)
         {
             var path = parameter.ToString();
-            System.Diagnostics.Process.Start(path);
+            var file = new FileInfo(path);
+            System.Diagnostics.Process.Start(file.DirectoryName);
         }
     }
 }
