@@ -5,18 +5,21 @@ using System.Linq;
 
 namespace FileMirroringTool.Models
 {
-    internal class BackupInfo
+    public class BackupInfo
     {
         public string TargetDirectory { get; set; } = string.Empty;
-        public List<BackupFile> FileInfos { get; set; }
+        public List<BackupFile> FileInfos { get; set; } = new List<BackupFile>();
 
         public BackupInfo(string targetDirectory)
         {
             TargetDirectory = targetDirectory;
 
-            FileInfos =
-                Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories)
-                .Select(x => new BackupFile(targetDirectory, x)).ToList();
+            if (string.IsNullOrEmpty(targetDirectory)) return;
+            
+            var dir = new DirectoryInfo(targetDirectory);
+            if (dir.Exists)
+                FileInfos = Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories)
+                    .Select(x => new BackupFile(targetDirectory, x)).ToList();
         }
 
         public void RunAllBackup()
@@ -105,9 +108,7 @@ namespace FileMirroringTool.Models
             //新規バックアップの作成
             var orig_span = runTime - TargetFile.LastWriteTime;
 
-            //前回から１時間以内の場合は更新しない？
             //最終的な更新日時が変わっていなければ更新は不要
-
             var newBackupFile = GetBacnUpFIleInfo(GetBackupDirectory(orig_span));
             if (newBackupFile == null) return;
 

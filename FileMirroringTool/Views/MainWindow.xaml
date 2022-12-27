@@ -6,11 +6,16 @@
         xmlns:local="clr-namespace:FileMirroringTool"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d" MouseDown="Window_MouseDown"
-        Title="MirroringTool" Height="500" Width="900">
+        Title="MirroringTool" Height="800" Width="900" MinHeight="600" MinWidth="900">
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="SortPara" Direction="Ascending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <CollectionViewSource x:Name="CoDataSource2" x:Key="NowDataView2"  Source="{Binding BackUpFileList}" >
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="LastWriteTime" Direction="Ascending"/>
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </Window.Resources>
@@ -20,7 +25,8 @@
                 <RowDefinition Height="25"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="200"/>
                 <RowDefinition Height="30"/>
                 <RowDefinition/>
                 <RowDefinition Height="30"/>
@@ -38,8 +44,6 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Sort："></Label>
@@ -50,12 +54,6 @@
                      ToolTipService.ShowDuration="10000000"
                      ToolTip="処理順を設定します。数値が大きいほど先に処理されます。"
                      Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Column="2" Content="BackupMode："></Label>
-
-                <CheckBox Margin="5,0,0,0" Grid.Column="3"
-                        ToolTip="差分バックアップを作成します。&#xa;1h以内：15mごと&#xa;48h以内：1hごと&#xa;7day以内：1dayごと"
-                        IsChecked="{Binding NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -63,7 +61,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="55"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="バックアップ元："></Label>
+                <Label Grid.Column="0" Content="Source："></Label>
                 <TextBox Margin="5,0,0,0" Grid.Column="1"
                      Text="{Binding OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <Button Grid.Column="2" Content="参照" Margin="5,0,0,0"
@@ -75,7 +73,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="55"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="バックアップ先："></Label>
+                <Label Grid.Column="0" Content="Destination："></Label>
                 <TextBox Margin="5,0,0,0" Grid.Column="1"
                      Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" AcceptsReturn="True" ></TextBox>
@@ -83,6 +81,56 @@
                         Command="{Binding OpenDialogCommand}" CommandParameter="dest" VerticalAlignment="Bottom" ></Button>
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Grid.Row="0" Content="Backup："></Label>
+                <Grid Grid.Column="1" Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Margin="5,0,0,0" Grid.Row="0"
+                        Content="EnableBackup"
+                        ToolTip="差分バックアップを作成します。&#xa;1h以内：15mごと&#xa;48h以内：1hごと&#xa;7day以内：1dayごと"
+                        IsChecked="{Binding NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="55"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Label Grid.Column="0" Content="searchFile："></Label>
+                        <TextBox Margin="5,0,0,0" Grid.Column="1"
+                            Text="{Binding SearchFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                        <Button Margin="5,0,0,0" Grid.Column="2" Content="参照" Height="26" 
+                            Command="{Binding OpenDialogCommand}" CommandParameter="backup" VerticalAlignment="Bottom" ></Button>
+                    </Grid>
+                    <DataGrid Margin="0,5,0,0" Grid.Row="2"
+                    AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
+                    SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
+                    ItemsSource="{Binding Source={StaticResource NowDataView2}}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="LastWriteTime" Width="120" CanUserResize="False" Binding="{Binding LastWriteTime,Mode=OneWay}"/>
+                            <DataGridTextColumn Header="Path" Width="*" CanUserResize="False" Binding="{Binding FullName,Mode=OneWay}"/>
+                            <DataGridTemplateColumn IsReadOnly="True" Header="" Width="100" CanUserResize="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Height="26" Content="Explorerで開く"
+                                                Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding FullName}" ></Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Grid>
+            
+            <Grid Margin="0,5,0,0" Grid.Row="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50"/>
                     <ColumnDefinition Width="50"/>
@@ -104,7 +152,7 @@
                 <Button Grid.Column="5" Content="再読込"
                         Command="{Binding SettingCtrlCommand}" CommandParameter="reload"></Button>
             </Grid>
-            <DataGrid Margin="0,5,0,0" Grid.Row="5"
+            <DataGrid Margin="0,5,0,0" Grid.Row="6"
                 AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
                 SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
                 ItemsSource="{Binding Source={StaticResource NowDataView}}"
@@ -126,7 +174,7 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <Grid Margin="0,5,0,0" Grid.Row="6">
+            <Grid Margin="0,5,0,0" Grid.Row="7">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="120"/>

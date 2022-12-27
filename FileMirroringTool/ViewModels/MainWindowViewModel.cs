@@ -4,6 +4,8 @@ using System.Windows.Input;
 using FileMirroringTool.Models;
 using System.Collections.ObjectModel;
 using FileMirroringTool.ViewModels.Commands;
+using System.IO;
+using System.Linq;
 
 namespace FileMirroringTool.ViewModels
 {
@@ -13,12 +15,14 @@ namespace FileMirroringTool.ViewModels
         public ICommand SettingCtrlCommand { get; private set; }
         public ICommand MirroringCommand { get; private set; }
         public ICommand OpenDialogCommand { get; private set; }
+        public ICommand OpenExplorerCommand { get; private set; }
         public MainWindowViewModel()
         {
             MirrorListCtrlCommand = new MirrorListCtrl(this);
             SettingCtrlCommand = new SettingCtrl(this);
             MirroringCommand = new MirroringCtrl(this);
             OpenDialogCommand = new OpenDialogCtrl(this);
+            OpenExplorerCommand = new OpenExplorer(this);
             if (Settings.Default.MirrorList != null)
                 MirrorList = new ObservableCollection<MirrorInfo>(Settings.Default.MirrorList);
         }
@@ -37,6 +41,35 @@ namespace FileMirroringTool.ViewModels
         private MirrorInfo _selectedMirrorInfo;
         private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>();
         private string _autoIntervalStr = Settings.Default.AutomationIntervalStr;
+
+        private string _searchFile = string.Empty;
+        private ObservableCollection<FileInfo> _backUpFileList = new ObservableCollection<FileInfo>();
+        public string SearchFile
+        {
+            get => _searchFile;
+            set
+            {
+                _searchFile = value;
+                OnPropertyChanged(nameof(SearchFile));
+                if (string.IsNullOrEmpty(_searchFile) || !new FileInfo(_searchFile).Exists) return;
+
+                var files = new BackupFile(OrigPath, _searchFile);
+                var list = new ObservableCollection<FileInfo>(files.ExistsBackUpFiles);
+
+                //_backUpFileList.Clear();
+                BackUpFileList = list;
+                OnPropertyChanged(nameof(BackUpFileList));
+            }
+        }
+        public ObservableCollection<FileInfo> BackUpFileList
+        {
+            get => _backUpFileList;
+            set
+            {
+                _backUpFileList = value;
+                OnPropertyChanged(nameof(BackUpFileList));
+            }
+        }
 
         public MirrorInfo SelectedMirrorInfo
         {

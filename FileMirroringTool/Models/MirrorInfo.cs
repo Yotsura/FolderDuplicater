@@ -12,12 +12,9 @@ namespace FileMirroringTool.Models
         public int ID { get; set; } = -1;
         public int Sort { get; set; } = 0;
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
-        //public string BackupSpans { get; set; } = string.Empty; //ファイルの更新周期、指定日数以内のファイルはスキップ
-
-        //double[] SpanList => BackupSpans.Split(',').Select(x => double.TryParse(x, out var num) ? num : -1)
-        //    .Where(x => x >= 0).Distinct().ToArray();
         public bool NeedBackup { get; set; } = false;
         public string BackupMode => NeedBackup ? "ON" : "OFF";
+        public BackupInfo BackupInfo => new BackupInfo(OrigPath);
 
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
@@ -59,6 +56,9 @@ namespace FileMirroringTool.Models
 
         public void MirroringInvoke(MainWindowViewModel mwvm, CancellationToken token)
         {
+            if (NeedBackup)
+                BackupInfo.RunAllBackup();
+
             FileCounter = new FileCount();
             token.ThrowIfCancellationRequested();
             try
