@@ -35,6 +35,7 @@ namespace FileMirroringTool.ViewModels.Commands
             Settings.Default.MirrorList = _mwvm.MirrorList.ToList();
             Settings.Default.Save();
 
+            _mwvm.SearchFile = string.Empty;
             if (parameter.ToString() == "auto")
                 AutoMirror();
             else

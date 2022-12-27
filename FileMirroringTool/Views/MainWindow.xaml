@@ -171,12 +171,12 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Content="SearchBackupFile："></Label>
-                    <TextBox Margin="5,0,0,0" Grid.Column="1" IsReadOnly="True"
+                    <TextBox Margin="5,0,0,0" Grid.Column="1"
                             Text="{Binding SearchFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <Button Margin="5,0,0,0" Grid.Column="2" Content="参照" Height="26" 
                             Command="{Binding OpenDialogCommand}" CommandParameter="backup" VerticalAlignment="Bottom" ></Button>
                 </Grid>
-                <DataGrid Margin="0,5,0,0" Grid.Row="1"
+                <DataGrid Margin="0,5,0,0" Grid.Row="1" Name="SubDataGrid"
                         AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
                         SelectedItem="{Binding SelectedBackupFile, Mode=TwoWay}"
                         ItemsSource="{Binding Source={StaticResource NowDataView2}}">
