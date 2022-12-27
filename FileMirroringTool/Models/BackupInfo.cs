@@ -8,7 +8,7 @@ namespace FileMirroringTool.Models
     internal class BackupInfo
     {
         public string TargetDirectory { get; set; } = string.Empty;
-        public List<BackupFile> FileInfos { get; set; }
+        public BackupFile[] FileInfos { get; set; }
 
         public BackupInfo(string targetDirectory)
         {
@@ -16,12 +16,21 @@ namespace FileMirroringTool.Models
 
             FileInfos =
                 Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories)
-                .Select(x => new BackupFile(targetDirectory, x)).ToList();
+                .Where(file =>
+                {
+                    var attr = File.GetAttributes(file);
+                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
+                    if ((attr & FileAttributes.System) == FileAttributes.System) return false;
+                    return true;
+                }).Select(x => new BackupFile(targetDirectory, x)).ToArray();
         }
 
         public void RunAllBackup()
         {
-            FileInfos.ForEach(x => x.RunBackup());
+            foreach (var file in FileInfos)
+            {
+                file.RunBackup();
+            }
             //空ディレクトリ削除
             DeleteEmptyDirs(BackUpUtils.GetBackupRootDirName(new DirectoryInfo(TargetDirectory)));
         }

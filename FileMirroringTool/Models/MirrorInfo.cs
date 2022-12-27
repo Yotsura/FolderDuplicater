@@ -73,7 +73,15 @@ namespace FileMirroringTool.Models
                             .ToArray()
                     ));
                 var updList =
-                    Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories).ToArray();
+                    Directory.EnumerateFiles(OrigPath, "*", SearchOption.AllDirectories)
+                    .Where(file =>
+                    {
+                        var attr = File.GetAttributes(file);
+                        if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
+                        if ((attr & FileAttributes.System) == FileAttributes.System) return false;
+                        return true;
+                    }).ToArray();
+
                 mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * ExistDestPathsList.Count();
 
                 foreach (var (dir, files) in delList)
