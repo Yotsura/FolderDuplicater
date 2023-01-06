@@ -1,4 +1,5 @@
-﻿using FileMirroringTool.ViewModels;
+﻿using FileMirroringTool.Utils;
+using FileMirroringTool.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -103,6 +104,8 @@ namespace FileMirroringTool.Models
                         file.DeleteDestFile();
                         FileCounter.DelCnt++;
                     }
+                    //空フォルダの削除
+                    FileUtils.DeleteEmptyDirs(dir);
                 }
 
                 foreach (var destPath_orig in ExistDestPathsList)

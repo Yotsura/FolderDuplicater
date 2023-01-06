@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileMirroringTool.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,36 +36,7 @@ namespace FileMirroringTool.Models
                 file.RunBackup();
             }
             //空ディレクトリ削除
-            DeleteEmptyDirs(BackUpUtils.GetBackupRootDirName(new DirectoryInfo(TargetDirectory)));
-        }
-
-        static void DeleteEmptyDirs(string dir)
-        {
-            if (String.IsNullOrEmpty(dir))
-                throw new ArgumentException(
-                    "Starting directory is a null reference or an empty string",
-                    "dir");
-
-            try
-            {
-                foreach (var d in Directory.EnumerateDirectories(dir))
-                {
-                    DeleteEmptyDirs(d);
-                }
-
-                var entries = Directory.EnumerateFileSystemEntries(dir);
-
-                if (!entries.Any())
-                {
-                    try
-                    {
-                        Directory.Delete(dir);
-                    }
-                    catch (UnauthorizedAccessException) { }
-                    catch (DirectoryNotFoundException) { }
-                }
-            }
-            catch (UnauthorizedAccessException) { }
+            FileUtils.DeleteEmptyDirs(BackUpUtils.GetBackupRootDirName(new DirectoryInfo(TargetDirectory)));
         }
     }
 
@@ -156,26 +128,5 @@ namespace FileMirroringTool.Models
             BackupHour = 8 * 24;
             BackUpDir = new DirectoryInfo(BackUpUtils.GetBackupDirName(sourcedir));
         }
-    }
-
-    public static class BackUpUtils
-    {
-        /// <summary>
-        /// 指定時間前のバックアップフォルダ名を取得します。
-        /// </summary>
-        public static string GetBackupDirName(this DirectoryInfo sourcedir, double hour)
-            => Path.Combine(GetBackupRootDirName(sourcedir), hour.ToString() + "h");
-
-        /// <summary>
-        /// メインのバックアップディレクトリ名を取得します。
-        /// </summary>
-        public static string GetBackupDirName(this DirectoryInfo sourcedir)
-            => Path.Combine(GetBackupRootDirName(sourcedir), "Main");
-
-        /// <summary>
-        /// バックアップ全体の親ディレクトリを取得します。
-        /// </summary>
-        public static string GetBackupRootDirName(this DirectoryInfo sourcedir)
-            => Path.Combine(sourcedir.Parent.FullName, $"!Backup_{sourcedir.Name}");
     }
 }

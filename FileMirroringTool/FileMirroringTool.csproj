@@ -203,6 +203,8 @@
     </ApplicationDefinition>
     <Compile Include="Models\BackupInfo.cs" />
     <Compile Include="Models\FileCount.cs" />
+    <Compile Include="Utils\BackUpUtils.cs" />
+    <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ViewModels\Commands\MirrorListCtrl.cs" />
     <Compile Include="ViewModels\Commands\MirroringCtrl.cs" />
     <Compile Include="ViewModels\Commands\OpenDialogCtrl.cs" />
