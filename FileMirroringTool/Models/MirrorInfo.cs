@@ -76,10 +76,18 @@ namespace FileMirroringTool.Models
                     Directory.EnumerateFiles(OrigPath, "*", SearchOption.AllDirectories)
                     .Where(file =>
                     {
-                        var attr = File.GetAttributes(file);
-                        if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
-                        if ((attr & FileAttributes.System) == FileAttributes.System) return false;
-                        return true;
+                        try
+                        {
+                            var attr = File.GetAttributes(file);
+                            if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
+                            if ((attr & FileAttributes.System) == FileAttributes.System) return false;
+                            return true;
+                        }
+                        catch(Exception e)
+                        {
+                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file}");
+                            return true; //ファイルが壊れている可能性？
+                        }
                     }).ToArray();
 
                 mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * ExistDestPathsList.Count();
@@ -106,13 +114,19 @@ namespace FileMirroringTool.Models
                     {
                         token.ThrowIfCancellationRequested();
                         mwvm.FileCnt_Checked++;
-
-                        var data = new FileData(OrigPath, destPath_orig, file, true);
-                        mwvm.PrgFileName = data.DestInfo.FullName;
-                        if (data.IsUpdatedFile) FileCounter.UpdCnt++;
-                        else if (data.IsNewFile) FileCounter.AddCnt++;
-                        else continue;
-                        data.DupricateFile();
+                        try
+                        {
+                            var data = new FileData(OrigPath, destPath_orig, file, true);
+                            mwvm.PrgFileName = data.DestInfo.FullName;
+                            if (data.IsUpdatedFile) FileCounter.UpdCnt++;
+                            else if (data.IsNewFile) FileCounter.AddCnt++;
+                            else continue;
+                            data.DupricateFile();
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file}");
+                        }
                     }
                 }
             }
@@ -121,7 +135,7 @@ namespace FileMirroringTool.Models
                 if (e is OperationCanceledException)
                     System.Diagnostics.Debug.Print("■Mirroring was manualy stopeed.", e.Message);
                 else
-                    Console.WriteLine("Exception: " + e.GetType().Name);
+                    System.Diagnostics.Debug.Print("Exception: " + e.GetType().Name);
             }
         }
     }
