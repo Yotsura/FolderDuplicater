@@ -20,8 +20,9 @@
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
         <converter:DateConverter x:Key="DateConverter"/>
-        <converter:FileInfoConverterr x:Key="FileInfoConverter"/>
+        <converter:FileInfoConverter x:Key="FileInfoConverter"/>
         <converter:FileNameConverter x:Key="FileNameConverter"/>
+        <converter:BoolToOnOffConverter x:Key="BoolToOnOffConverter"/>
     </Window.Resources>
     <Grid>
         <Grid Margin="10,10,10,10">
@@ -48,6 +49,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Sort："></Label>
@@ -62,6 +64,11 @@
                         Content="EnableBackup"
                         ToolTip="差分バックアップを作成します。&#xa;1h以内：15mごと&#xa;48h以内：1hごと&#xa;7day以内：1dayごと"
                         IsChecked="{Binding NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <CheckBox Margin="5,0,0,0" Grid.Column="3"
+                        Content="Skip[!*]s"
+                        ToolTip="!で始まるフォルダ・ファイルを処理の対象外にします。"
+                        IsChecked="{Binding SkipExclamation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">
@@ -117,7 +124,7 @@
                 ItemsSource="{Binding Source={StaticResource NowDataView}}"
                 Name="MainDataGrid">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="50" CanUserResize="False">
+                    <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="35" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -125,11 +132,14 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Sort" Width="50" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="BackupMode" Width="100" CanUserResize="False" Binding="{Binding BackupMode,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="ミラー元" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="ミラー先" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="ID" Width="35" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="Sort" Width="35" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="Backup" Width="60" CanUserResize="False"
+                                        Binding="{Binding NeedBackup,Mode=OneWay,Converter={StaticResource BoolToOnOffConverter}}"/>
+                    <DataGridTextColumn Header="Skip[!*]s" Width="60" CanUserResize="False"
+                                        Binding="{Binding SkipExclamation,Mode=OneWay,Converter={StaticResource BoolToOnOffConverter}}"/>
+                    <DataGridTextColumn Header="Mirror Source" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="Mirror Destination" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
                 </DataGrid.Columns>
             </DataGrid>
             <Grid Margin="0,5,0,0" Grid.Row="6">

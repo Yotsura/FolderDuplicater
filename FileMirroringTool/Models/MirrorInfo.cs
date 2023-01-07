@@ -13,9 +13,9 @@ namespace FileMirroringTool.Models
         public int ID { get; set; } = -1;
         public int Sort { get; set; } = 0;
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
+        public bool SkipExclamation { get; set; } = false;
         public bool NeedBackup { get; set; } = false;
-        public string BackupMode => NeedBackup ? "ON" : "OFF";
-        public BackupInfo BackupInfo => new BackupInfo(OrigPath);
+        public BackupInfo BackupInfo => new BackupInfo(OrigPath, SkipExclamation);
 
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
@@ -37,8 +37,8 @@ namespace FileMirroringTool.Models
             MirrorInfo record = (MirrorInfo)obj;
             var result = ID == record.ID &&
                 Sort == record.Sort &&
-                BackupMode == record.BackupMode &&
-                //BackupSpans == record.BackupSpans &&
+                SkipExclamation == record.SkipExclamation &&
+                NeedBackup == record.NeedBackup &&
                 OrigPath == record.OrigPath &&
                 DestPathsStr == record.DestPathsStr;
             return result;
@@ -47,8 +47,8 @@ namespace FileMirroringTool.Models
         public override int GetHashCode()
         {
             var hashCode = ID ^ Sort
-                ^ BackupMode.GetHashCode()
-                //^ BackupSpans.GetHashCode()
+                ^ SkipExclamation.GetHashCode()
+                ^ NeedBackup.GetHashCode()
                 ^ OrigPath.GetHashCode()
                 ^ DestPathsStr.GetHashCode();
 
@@ -69,24 +69,27 @@ namespace FileMirroringTool.Models
                     (
                         dir: destPath,
                         files: Directory.EnumerateFiles(destPath, "*", SearchOption.AllDirectories)
+                            .Where(path => SkipExclamation ? !path.Contains(@"\!") : true)
                             .Select(file => new FileData(OrigPath, destPath, file, false))
                             .Where(file => file.IsDeletedFile)
                             .ToArray()
                     ));
                 var updList =
                     Directory.EnumerateFiles(OrigPath, "*", SearchOption.AllDirectories)
-                    .Where(file =>
+                    .Where(path =>
                     {
+                        if (SkipExclamation && path.Contains(@"\!"))
+                            return false;
                         try
                         {
-                            var attr = File.GetAttributes(file);
+                            var attr = File.GetAttributes(path);
                             if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
                             if ((attr & FileAttributes.System) == FileAttributes.System) return false;
                             return true;
                         }
                         catch(Exception e)
                         {
-                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file}");
+                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{path}");
                             return true; //ファイルが壊れている可能性？
                         }
                     }).ToArray();

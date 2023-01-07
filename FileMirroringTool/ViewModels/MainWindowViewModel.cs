@@ -36,6 +36,7 @@ namespace FileMirroringTool.ViewModels
         #region MainWindowProps
         private string _sort = string.Empty;
         private bool _needBackup = false;
+        private bool _skipExclamation = false;
         private string _origPath = string.Empty;
         private string _destPath = string.Empty;
         private MirrorInfo _selectedMirrorInfo;
@@ -94,6 +95,8 @@ namespace FileMirroringTool.ViewModels
                 OnPropertyChanged(nameof(Sort));
                 NeedBackup = value?.NeedBackup??false;
                 OnPropertyChanged(nameof(NeedBackup));
+                SkipExclamation = value?.SkipExclamation ?? false;
+                OnPropertyChanged(nameof(SkipExclamation));
                 OrigPath = value?.OrigPath ?? string.Empty;
                 OnPropertyChanged(nameof(OrigPath));
                 DestPath = value?.DestPathsStr ?? string.Empty;
@@ -118,6 +121,16 @@ namespace FileMirroringTool.ViewModels
             {
                 _needBackup = value;
                 OnPropertyChanged(nameof(NeedBackup));
+            }
+        }
+
+        public bool SkipExclamation
+        {
+            get => _skipExclamation;
+            set
+            {
+                _skipExclamation = value;
+                OnPropertyChanged(nameof(SkipExclamation));
             }
         }
 

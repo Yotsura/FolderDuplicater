@@ -11,7 +11,7 @@ namespace FileMirroringTool.Models
         public string TargetDirectory { get; set; } = string.Empty;
         public BackupFile[] FileInfos { get; set; }
 
-        public BackupInfo(string targetDirectory)
+        public BackupInfo(string targetDirectory , bool skipExclamation)
         {
             TargetDirectory = targetDirectory;
 
@@ -20,9 +20,10 @@ namespace FileMirroringTool.Models
             if (!dir.Exists) return;
             FileInfos =
                 Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories)
-                .Where(file =>
+                .Where(path =>
                 {
-                    var attr = File.GetAttributes(file);
+                    if (skipExclamation && path.Contains(@"\!")) return false;
+                    var attr = File.GetAttributes(path);
                     if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
                     if ((attr & FileAttributes.System) == FileAttributes.System) return false;
                     return true;

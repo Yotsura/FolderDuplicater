@@ -10,7 +10,7 @@ using System.Windows.Data;
 namespace FileMirroringTool.Views.ValueConverter
 {
     [ValueConversion(typeof(FileInfo), typeof(String))]
-    internal class FileInfoConverterr : IValueConverter
+    internal class FileInfoConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
