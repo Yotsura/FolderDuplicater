@@ -74,6 +74,7 @@ namespace FileMirroringTool.ViewModels.Commands
             if (_mwvm.AutoInterval <= 0) _mwvm.AutoInterval = 1;
             Settings.Default.AutomationIntervalStr = _mwvm.AutoIntervalStr;
             Settings.Default.Save();
+            _mwvm.AutoRunning = true;
 
             var cancelTokenSource = new CancellationTokenSource();
             var cancelToken = cancelTokenSource.Token;
@@ -102,6 +103,7 @@ namespace FileMirroringTool.ViewModels.Commands
                 System.Windows.MessageBox.Show("自動ミラーリングが停止されました。"
                     + $"\r\n最後の実行：{(runCnt > 0 ? lastRunTime.ToString("HH:mm:ss") : string.Empty)}");
                 cancelTokenSource.Dispose();
+                _mwvm.AutoRunning = false;
             };
             pd.ShowDialog();
         }

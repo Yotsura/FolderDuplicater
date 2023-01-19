@@ -42,6 +42,7 @@ namespace FileMirroringTool.ViewModels
         private MirrorInfo _selectedMirrorInfo;
         private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>();
         private string _autoIntervalStr = Settings.Default.AutomationIntervalStr;
+        private bool _autoRunnning = false;
 
         private string _searchFile = string.Empty;
         private FileInfo _selectedBackupFile;
@@ -161,6 +162,15 @@ namespace FileMirroringTool.ViewModels
             {
                 _mirrorList = value;
                 OnPropertyChanged(nameof(MirrorList));
+            }
+        }
+        public bool AutoRunning
+        {
+            get => _autoRunnning;
+            set
+            {
+                _autoRunnning = value;
+                OnPropertyChanged(nameof(AutoRunning));
             }
         }
 

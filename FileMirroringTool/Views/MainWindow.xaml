@@ -11,7 +11,7 @@
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
             <CollectionViewSource.SortDescriptions>
-                <componentModel:SortDescription PropertyName="SortPara" Direction="Ascending"/>
+                <componentModel:SortDescription PropertyName="SortPara" Direction="Ascending"/> 
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
         <CollectionViewSource x:Name="CoDataSource2" x:Key="NowDataView2"  Source="{Binding BackUpFileList}" >
