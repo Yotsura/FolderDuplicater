@@ -35,5 +35,16 @@ namespace FileMirroringTool.Utils
             catch (UnauthorizedAccessException) { }
         }
 
+        public static string[] GetAllFiles(string targetDirectory)
+        {
+            var dirs = Directory.EnumerateDirectories(targetDirectory, "*", SearchOption.TopDirectoryOnly)
+                .Where(path => !path.Contains(@"\!")).ToArray();
+            var files = Directory.EnumerateFiles(targetDirectory, "*", SearchOption.TopDirectoryOnly).ToArray();
+            if (files.Length < 1 && dirs.Length < 1)
+                return files;
+            var children = dirs.Select(dir => GetAllFiles(dir)).SelectMany(x => x).ToArray();
+            var result = files.Concat(children).ToArray();
+            return result;
+        }
     }
 }

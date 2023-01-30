@@ -58,28 +58,38 @@ namespace FileMirroringTool.Models
         public void MirroringInvoke(MainWindowViewModel mwvm, CancellationToken token)
         {
             if (NeedBackup)
+            {
+                mwvm.PrgTitle = $"＜バックアップ中＞{OrigPath}";
                 BackupInfo.RunAllBackup();
+            }
 
             FileCounter = new FileCount();
-            token.ThrowIfCancellationRequested();
             try
             {
+                token.ThrowIfCancellationRequested();
+                mwvm.PrgTitle = $"＜削除対象リストアップ中＞";
                 var delList = ExistDestPathsList
                     .Select(destPath =>
                     (
                         dir: destPath,
-                        files: Directory.EnumerateFiles(destPath, "*", SearchOption.AllDirectories)
-                            .Where(path => SkipExclamation ? !path.Contains(@"\!") : true)
+                        files:
+                            (SkipExclamation ?
+                                FileUtils.GetAllFiles(destPath) :
+                                Directory.EnumerateFiles(destPath, "*", System.IO.SearchOption.AllDirectories))
                             .Select(file => new FileData(OrigPath, destPath, file, false))
                             .Where(file => file.IsDeletedFile)
                             .ToArray()
                     ));
+
+
+
+                mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
                 var updList =
-                    Directory.EnumerateFiles(OrigPath, "*", SearchOption.AllDirectories)
+                    (SkipExclamation ?
+                        FileUtils.GetAllFiles(OrigPath) :
+                        Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories))
                     .Where(path =>
                     {
-                        if (SkipExclamation && path.Contains(@"\!"))
-                            return false;
                         try
                         {
                             var attr = File.GetAttributes(path);

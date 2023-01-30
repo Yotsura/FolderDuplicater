@@ -18,16 +18,28 @@ namespace FileMirroringTool.Models
             if (string.IsNullOrEmpty(targetDirectory)) return;
             var dir = new DirectoryInfo(targetDirectory);
             if (!dir.Exists) return;
+
+            //var sw = new System.Diagnostics.Stopwatch();
+            //sw.Start();
             FileInfos =
-                Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories)
+                (skipExclamation ?
+                    FileUtils.GetAllFiles(targetDirectory) :
+                    Directory.EnumerateFiles(targetDirectory, "*", System.IO.SearchOption.AllDirectories))
                 .Where(path =>
                 {
-                    if (skipExclamation && path.Contains(@"\!")) return false;
-                    var attr = File.GetAttributes(path);
-                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
-                    if ((attr & FileAttributes.System) == FileAttributes.System) return false;
-                    return true;
+                    try
+                    {
+                        var attr = File.GetAttributes(path);
+                        if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
+                        if ((attr & FileAttributes.System) == FileAttributes.System) return false;
+                        return true;
+                    }
+                    catch { return false; }
                 }).Select(x => new BackupFile(targetDirectory, x)).ToArray();
+            //sw.Stop();
+            //var resultTxt = $"\r\n処理にかかった時間A: {sw.Elapsed}";
+            // 結果表示
+            //System.Diagnostics.Debug.Print(resultTxt);
         }
 
         public void RunAllBackup()
