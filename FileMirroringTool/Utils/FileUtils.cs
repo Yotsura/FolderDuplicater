@@ -35,10 +35,13 @@ namespace FileMirroringTool.Utils
             catch (UnauthorizedAccessException) { }
         }
 
+        /// <summary>
+        /// 指定ディレクトリ以下で!で始まらないファイル/フォルダ以外すべて取得
+        /// </summary>
         public static string[] GetAllFiles(string targetDirectory)
         {
             var dirs = Directory.EnumerateDirectories(targetDirectory, "*", SearchOption.TopDirectoryOnly)
-                .Where(path => !path.Contains(@"\!")).ToArray();
+                .Where(path => !path.Replace(targetDirectory, string.Empty).Contains(@"\!")).ToArray();
             var files = Directory.EnumerateFiles(targetDirectory, "*", SearchOption.TopDirectoryOnly).ToArray();
             if (files.Length < 1 && dirs.Length < 1)
                 return files;
