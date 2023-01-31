@@ -79,7 +79,7 @@ namespace FileMirroringTool.Models
                             .Select(file => new FileData(OrigPath, destPath, file, false))
                             .Where(file => file.IsDeletedFile)
                             .ToArray()
-                    ));
+                    )).ToArray();
 
                 mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
                 var updList =
