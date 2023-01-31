@@ -81,8 +81,6 @@ namespace FileMirroringTool.Models
                             .ToArray()
                     ));
 
-
-
                 mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
                 var updList =
                     (SkipExclamation ?
@@ -114,8 +112,8 @@ namespace FileMirroringTool.Models
                         token.ThrowIfCancellationRequested();
                         mwvm.FileCnt_Checked++;
                         mwvm.PrgFileName = file.DestInfo.FullName;
-                        file.DeleteDestFile();
-                        FileCounter.DelCnt++;
+                        if (file.TryDeleteDestFile())
+                            FileCounter.DelCnt++;
                     }
                     //空フォルダの削除
                     FileUtils.DeleteEmptyDirs(dir);
@@ -134,10 +132,16 @@ namespace FileMirroringTool.Models
                         {
                             var data = new FileData(OrigPath, destPath_orig, file, true);
                             mwvm.PrgFileName = data.DestInfo.FullName;
-                            if (data.IsUpdatedFile) FileCounter.UpdCnt++;
-                            else if (data.IsNewFile) FileCounter.AddCnt++;
+                            if (data.IsUpdatedFile)
+                            {
+                                if (data.TryDupricateFile()) FileCounter.UpdCnt++;
+                            }
+                            else if (data.IsNewFile)
+                            {
+                                if (data.TryDupricateFile()) FileCounter.AddCnt++;
+                            }
                             else continue;
-                            data.DupricateFile();
+
                         }
                         catch (Exception e)
                         {

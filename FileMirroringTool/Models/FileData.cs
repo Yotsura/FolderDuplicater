@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using MS.WindowsAPICodePack.Internal;
+using System;
+using System.IO;
 using System.Linq;
 
 namespace FileMirroringTool.Models
@@ -32,24 +34,54 @@ namespace FileMirroringTool.Models
             }
         }
 
-        public void DupricateFile()
+        public bool TryDupricateFile()
         {
+            var result = false;
             if (!Directory.Exists(DestInfo.DirectoryName))
                 Directory.CreateDirectory(DestInfo.DirectoryName);
-            File.Copy(OrigInfo.FullName, DestInfo.FullName, true);
+            try
+            {
+                File.Copy(OrigInfo.FullName, DestInfo.FullName, true);
+                result = true;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Print($"Exception:{e.GetType().Name}\r\n{DestInfo.FullName}");
+            }
+            return result;
         }
 
-        public void DeleteDestFile()
+        public bool TryDeleteDestFile()
         {
-            if (File.Exists(DestInfo.FullName)) File.Delete(DestInfo.FullName);
+            var result = false;
+            if (File.Exists(DestInfo.FullName))
+            {
+                try
+                {
+                    File.Delete(DestInfo.FullName);
+                    result = true;
+                }
+                catch(Exception e)
+                {
+                    System.Diagnostics.Debug.Print($"Exception:{e.GetType().Name}\r\n{DestInfo.FullName}");
+                }
+            }
             //空のフォルダをさかのぼって削除
             DelDir(DestInfo.DirectoryName);
+            return result;
         }
 
         void DelDir(string dir)
         {
             if (Directory.EnumerateFileSystemEntries(dir, "*", System.IO.SearchOption.AllDirectories).Any()) return;
-            Directory.Delete(dir, false);
+            try
+            {
+                Directory.Delete(dir, false);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.Print($"Exception:{e.GetType().Name}\r\n{dir}");
+            }
             DelDir(new DirectoryInfo(dir).Parent.FullName);
         }
     }
