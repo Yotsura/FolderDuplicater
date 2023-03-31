@@ -63,9 +63,15 @@ namespace FileMirroringTool.Models
         {
             TargetDir = new DirectoryInfo(targetDirPath);
             TargetFile = new FileInfo(targetFilePath);
+            //1h以内は15m間隔
+            //2～4hは1h間隔
+            //3～7dは24h間隔
+            //2～5wは1w間隔
             HourBackupDirs = Enumerable.Range(0, 4).Select(x => x * 0.25)
                 .Concat(Enumerable.Range(1, 48).Select(x => (double)x))
                 .Concat(Enumerable.Range(3, 5).Select(x => (double)x * 24))
+                .Concat(Enumerable.Range(2, 4).Select(x => (double)x * 7 * 24))
+                .Distinct()
                 .Select(x => new BackupDirectoryInfo(TargetDir, x))
                 .OrderByDescending(x => x.BackupHour).ToList();
             MainBackupDir = new BackupDirectoryInfo(TargetDir);
