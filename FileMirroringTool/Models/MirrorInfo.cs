@@ -2,24 +2,92 @@
 using FileMirroringTool.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace FileMirroringTool.Models
 {
-    public class MirrorInfo
+    public class MirrorInfo : INotifyPropertyChanged
     {
-        public int ID { get; set; } = -1;
-        public int Sort { get; set; } = 0;
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        int _id = -1;
+        int _sort = 0;
+        bool _skipExclamation = false;
+        bool _needBackup = false;
+        bool _isChecked = false;
+        string _origPath = string.Empty;
+        string _destPathsStr = string.Empty;
+        public int ID
+        {
+            get => _id;
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
+        public int Sort
+        {
+            get => _sort;
+            set
+            {
+                _sort = value;
+                OnPropertyChanged();
+            }
+        }
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
-        public bool SkipExclamation { get; set; } = false;
-        public bool NeedBackup { get; set; } = false;
+        public bool SkipExclamation
+        {
+            get => _skipExclamation;
+            set
+            {
+                _skipExclamation = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool NeedBackup
+        {
+            get => _needBackup;
+            set
+            {
+                _needBackup = value;
+                OnPropertyChanged();
+            }
+        }
         public BackupInfo BackupInfo => new BackupInfo(OrigPath, SkipExclamation);
 
-        public bool IsChecked { get; set; } = true;
-        public string OrigPath { get; set; } = string.Empty;
-        public string DestPathsStr { get; set; } = string.Empty;
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set
+            {
+                _isChecked = value;
+                OnPropertyChanged();
+            }
+        }
+        public string OrigPath
+        {
+            get => _origPath;
+            set
+            {
+                _origPath = value;
+                OnPropertyChanged();
+            }
+        }
+        public string DestPathsStr
+        {
+            get => _destPathsStr;
+            set
+            {
+                _destPathsStr = value;
+                OnPropertyChanged();
+            }
+        }
 
         public FileCount FileCounter { get; set; } = new FileCount();
 

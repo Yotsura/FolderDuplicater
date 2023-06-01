@@ -9,12 +9,12 @@
         mc:Ignorable="d" MouseDown="Window_MouseDown"
         Title="MirroringTool" Height="650" Width="900" MinHeight="600" MinWidth="900">
     <Window.Resources>
-        <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
+        <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" IsLiveSortingRequested="True" >
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="SortPara" Direction="Ascending"/> 
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
-        <CollectionViewSource x:Name="CoDataSource2" x:Key="NowDataView2"  Source="{Binding BackUpFileList}" >
+        <CollectionViewSource x:Name="CoDataSource2" x:Key="NowDataView2"  Source="{Binding BackUpFileList}" IsLiveSortingRequested="True">
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="LastWriteTime" Direction="Ascending"/>
             </CollectionViewSource.SortDescriptions>
@@ -59,16 +59,16 @@
                      CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
                      ToolTipService.ShowDuration="10000000"
                      ToolTip="処理順を設定します。数値が大きいほど先に処理されます。"
-                     Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                     Text="{Binding SelectedMirrorInfo.Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <CheckBox Margin="5,0,0,0" Grid.Column="2"
                         Content="EnableBackup"
                         ToolTip="差分バックアップを作成します。&#xa;1h以内：15mごと&#xa;48h以内：1hごと&#xa;7day以内：1dayごと"
-                        IsChecked="{Binding NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        IsChecked="{Binding SelectedMirrorInfo.NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <CheckBox Margin="5,0,0,0" Grid.Column="3"
                         Content="Skip[!*]s"
                         ToolTip="!で始まるフォルダ・ファイルを処理の対象外にします。"
-                        IsChecked="{Binding SkipExclamation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        IsChecked="{Binding SelectedMirrorInfo.SkipExclamation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
             </Grid>
             <Grid Margin="0,5,0,0" Grid.Row="2">
@@ -79,7 +79,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Source："></Label>
                 <TextBox Margin="5,0,0,0" Grid.Column="1"
-                     Text="{Binding OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                     Text="{Binding SelectedMirrorInfo.OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                 <Button Grid.Column="2" Content="参照" Margin="5,0,0,0"
                         Command="{Binding OpenDialogCommand}" CommandParameter="orig" ></Button>
             </Grid>
@@ -91,7 +91,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Destination："></Label>
                 <TextBox Margin="5,0,0,0" Grid.Column="1"
-                     Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding SelectedMirrorInfo.DestPathsStr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" AcceptsReturn="True" ></TextBox>
                 <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26" 
                         Command="{Binding OpenDialogCommand}" CommandParameter="dest" VerticalAlignment="Bottom" ></Button>

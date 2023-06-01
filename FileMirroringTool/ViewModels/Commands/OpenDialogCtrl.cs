@@ -40,13 +40,13 @@ namespace FileMirroringTool.ViewModels.Commands
             switch (para)
             {
                 case "orig":
-                    _mwvm.OrigPath = FolderDialog();
+                    _mwvm.SelectedMirrorInfo.OrigPath = FolderDialog();
                     break;
                 case "dest":
-                    _mwvm.DestPath += (string.IsNullOrEmpty(_mwvm.DestPath) ? string.Empty : "\n") + FolderDialog();
+                    _mwvm.SelectedMirrorInfo.DestPathsStr += (string.IsNullOrEmpty(_mwvm.SelectedMirrorInfo.DestPathsStr) ? string.Empty : "\n") + FolderDialog();
                     break;
                 case "backup":
-                    _mwvm.SearchFile = FileDialog(_mwvm.OrigPath);
+                    _mwvm.SearchFile = FileDialog(_mwvm.SelectedMirrorInfo.OrigPath);
                     break;
             }
         }

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using FileMirroringTool.ViewModels.Commands;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace FileMirroringTool.ViewModels
 {
@@ -29,16 +30,11 @@ namespace FileMirroringTool.ViewModels
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string propertyName)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         #endregion
 
         #region MainWindowProps
-        private string _sort = string.Empty;
-        private bool _needBackup = false;
-        private bool _skipExclamation = false;
-        private string _origPath = string.Empty;
-        private string _destPath = string.Empty;
         private MirrorInfo _selectedMirrorInfo;
         private ObservableCollection<MirrorInfo> _mirrorList = new ObservableCollection<MirrorInfo>();
         private string _autoIntervalStr = Settings.Default.AutomationIntervalStr;
@@ -53,10 +49,10 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _searchFile = value;
-                OnPropertyChanged(nameof(SearchFile));
+                OnPropertyChanged();
                 if (!string.IsNullOrEmpty(_searchFile) && new FileInfo(_searchFile).Exists)
                 {
-                    var files = new BackupFile(OrigPath, _searchFile);
+                    var files = new BackupFile(SelectedMirrorInfo.OrigPath, _searchFile);
                     var list = new ObservableCollection<FileInfo>(files.ExistsBackUpFiles);
                     BackUpFileList = list;
                 }
@@ -71,7 +67,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _backUpFileList = value;
-                OnPropertyChanged(nameof(BackUpFileList));
+                OnPropertyChanged();
             }
         }
         public FileInfo SelectedBackupFile
@@ -80,78 +76,22 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _selectedBackupFile = value;
-                OnPropertyChanged(nameof(SelectedBackupFile));
+                OnPropertyChanged();
             }
         }
 
         public MirrorInfo SelectedMirrorInfo
         {
-            get => _selectedMirrorInfo;
+            get
+            {
+                if (_selectedMirrorInfo == null)
+                    _selectedMirrorInfo = new MirrorInfo();
+                return _selectedMirrorInfo;
+            }
             set
             {
                 _selectedMirrorInfo = value;
-                OnPropertyChanged(nameof(SelectedMirrorInfo));
-
-                Sort = value?.Sort.ToString() ?? string.Empty;
-                OnPropertyChanged(nameof(Sort));
-                NeedBackup = value?.NeedBackup??false;
-                OnPropertyChanged(nameof(NeedBackup));
-                SkipExclamation = value?.SkipExclamation ?? false;
-                OnPropertyChanged(nameof(SkipExclamation));
-                OrigPath = value?.OrigPath ?? string.Empty;
-                OnPropertyChanged(nameof(OrigPath));
-                DestPath = value?.DestPathsStr ?? string.Empty;
-                OnPropertyChanged(nameof(DestPath));
-            }
-        }
-
-        public string Sort
-        {
-            get => _sort;
-            set
-            {
-                _sort = value;
-                OnPropertyChanged(nameof(Sort));
-            }
-        }
-
-        public bool NeedBackup
-        {
-            get => _needBackup;
-            set
-            {
-                _needBackup = value;
-                OnPropertyChanged(nameof(NeedBackup));
-            }
-        }
-
-        public bool SkipExclamation
-        {
-            get => _skipExclamation;
-            set
-            {
-                _skipExclamation = value;
-                OnPropertyChanged(nameof(SkipExclamation));
-            }
-        }
-
-        public string OrigPath
-        {
-            get => _origPath;
-            set
-            {
-                _origPath = value;
-                OnPropertyChanged(nameof(OrigPath));
-            }
-        }
-
-        public string DestPath
-        {
-            get => _destPath;
-            set
-            {
-                _destPath = value;
-                OnPropertyChanged(nameof(DestPath));
+                OnPropertyChanged();
             }
         }
 
@@ -161,7 +101,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _mirrorList = value;
-                OnPropertyChanged(nameof(MirrorList));
+                OnPropertyChanged();
             }
         }
         public bool AutoRunning
@@ -170,7 +110,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _autoRunnning = value;
-                OnPropertyChanged(nameof(AutoRunning));
+                OnPropertyChanged();
             }
         }
 
@@ -180,7 +120,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _autoIntervalStr = value;
-                OnPropertyChanged(nameof(AutoIntervalStr));
+                OnPropertyChanged();
             }
         }
         public double AutoInterval
@@ -189,7 +129,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 AutoIntervalStr = value.ToString();
-                OnPropertyChanged(nameof(AutoIntervalStr));
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -227,7 +167,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _prgVal = value;
-                OnPropertyChanged(nameof(PrgVal));
+                OnPropertyChanged();
             }
         }
         private string _prgStr = "0/0";
@@ -237,7 +177,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _prgStr = value;
-                OnPropertyChanged(nameof(PrgStr));
+                OnPropertyChanged();
             }
         }
 
@@ -248,7 +188,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _prgTitle = value;
-                OnPropertyChanged(nameof(PrgTitle));
+                OnPropertyChanged();
             }
         }
 
@@ -259,7 +199,7 @@ namespace FileMirroringTool.ViewModels
             set
             {
                 _prgFileName = value;
-                OnPropertyChanged(nameof(PrgFileName));
+                OnPropertyChanged();
             }
         }
         

@@ -21,15 +21,14 @@ namespace FileMirroringTool.ViewModels.Commands
 
         public bool CanExecute(object parameter)
         {
-            if (string.IsNullOrEmpty(_mwvm.OrigPath) ||
-                string.IsNullOrEmpty(_mwvm.DestPath))
+            if (string.IsNullOrEmpty(_mwvm.SelectedMirrorInfo.OrigPath) ||
+                string.IsNullOrEmpty(_mwvm.SelectedMirrorInfo.DestPathsStr))
                 return false;
 
             switch (parameter.ToString())
             {
                 case "add":
                     return true;
-                    //return _mwvm.SelectedMirrorInfo == null;
                 case "upd":
                 case "del":
                     return _mwvm.SelectedMirrorInfo != null;
@@ -41,27 +40,16 @@ namespace FileMirroringTool.ViewModels.Commands
         public void Execute(object parameter)
         {
             var nextID = (_mwvm.MirrorList.OrderByDescending(x => x.ID).FirstOrDefault()?.ID ?? 0) + 1;
-            var inputdata = new MirrorInfo
-            {
-                ID = _mwvm.SelectedMirrorInfo?.ID ?? nextID,
-                Sort = int.TryParse(_mwvm.Sort, out var snum) ? snum : 0,
-                NeedBackup = _mwvm.NeedBackup,
-                SkipExclamation = _mwvm.SkipExclamation,
-                OrigPath = _mwvm.OrigPath,
-                DestPathsStr = _mwvm.DestPath,
-            };
-            var targetItem = _mwvm.MirrorList.FirstOrDefault(x => x.ID == inputdata.ID);
+            var recordID = _mwvm.SelectedMirrorInfo?.ID ?? nextID;
+            var inputdata = _mwvm.SelectedMirrorInfo;
+            var targetItem = _mwvm.MirrorList.FirstOrDefault(x => x.ID == (_mwvm.SelectedMirrorInfo?.ID ?? nextID));
             switch (parameter.ToString())
             {
                 case "add":
                     inputdata.ID = nextID;
                     _mwvm.MirrorList.Add(inputdata);
-                    _mwvm.Sort = string.Empty;
-                    _mwvm.OrigPath = string.Empty;
-                    _mwvm.DestPath = string.Empty;
                     break;
                 case "upd":
-                    _mwvm.SelectedMirrorInfo = null;
                     _mwvm.MirrorList.Remove(targetItem);
                     _mwvm.MirrorList.Add(inputdata);
                     break;
@@ -69,6 +57,7 @@ namespace FileMirroringTool.ViewModels.Commands
                     _mwvm.MirrorList.Remove(targetItem);
                     break;
             }
+            _mwvm.SelectedMirrorInfo = new MirrorInfo();
         }
     }
 }
