@@ -44,7 +44,6 @@ namespace FileMirroringTool.ViewModels.Commands
 
         void ManualMirror()
         {
-            var result = string.Empty;
             var cancelTokenSource = new CancellationTokenSource();
             var cancelToken = cancelTokenSource.Token;
             var pd = new ProgressDialog(_mwvm, () =>
@@ -53,8 +52,6 @@ namespace FileMirroringTool.ViewModels.Commands
                 {
                     _mwvm.ResetPrgStat();
                     mirror.MirroringInvoke(_mwvm, cancelToken);
-                    result += $"\r\n【ID：{mirror.ID}（backup：{(mirror.NeedBackup ? "on" : "off")}）】"
-                        + mirror.FileCounter.CntInfoStr;
                     _mwvm.ResetPrgStat();
 
                     if (cancelToken.IsCancellationRequested) return;
@@ -62,11 +59,11 @@ namespace FileMirroringTool.ViewModels.Commands
             }, cancelTokenSource, false);
             pd.ShowDialog();
 
-            System.Windows.MessageBox.Show("ミラーリングが" +
-                (pd.IsCompleted ? "完了しました。" : "中止されました。") +
-                result);
+            var result =
+                string.Join("\r\n",
+                MirrorList.Select(mirror => $"【ID：{mirror.ID}（backup：{(mirror.NeedBackup ? "on" : "off")}）】{ mirror.FileCounter.CntInfoStr}"));
+            System.Windows.MessageBox.Show($"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}");
             cancelTokenSource.Dispose();
-
         }
 
         void AutoMirror()

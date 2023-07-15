@@ -110,8 +110,10 @@ namespace FileMirroringTool.Models
                         try
                         {
                             mwvm.PrgFileName = data.DestInfo.FullName;
-                            if (data.IsUpdatedFile && data.TryDupricateFile()) FileCounter.UpdCnt++;
-                            else if (data.IsNewFile && data.TryDupricateFile()) FileCounter.AddCnt++;
+                            if (data.TryDupricateFile())
+                                if (data.IsUpdatedFile)
+                                    FileCounter.UpdCnt++;
+                                else if (data.IsNewFile) FileCounter.AddCnt++;
                         }
                         catch (Exception e)
                         {
