@@ -57,6 +57,17 @@ namespace FileMirroringTool.Models
 
         public void MirroringInvoke(MainWindowViewModel mwvm, CancellationToken token)
         {
+            //ipadから保存した場合、pngがjpegになってるのを修正
+            //var testPath = @"D:\DropboxStrage\Dropbox\水星の魔女";
+            //var testFiles = Directory.EnumerateFiles(testPath,"ファイル*.jpeg",SearchOption.AllDirectories);
+            //testFiles.AsParallel().ForAll(sourceFilePath =>
+            //{
+            //    var fileInfo = new FileInfo(sourceFilePath);
+            //    var destFile = fileInfo.Name.Replace("ファイル", "file").Replace(" ", "_").Replace("jpeg", "png");
+            //    var destFilePath = Path.Combine(fileInfo.DirectoryName,destFile);
+            //    fileInfo.MoveTo(destFilePath);
+            //});
+
             if (NeedBackup)
             {
                 mwvm.PrgTitle = $"＜バックアップ中＞{OrigPath}";
@@ -67,21 +78,7 @@ namespace FileMirroringTool.Models
             try
             {
                 token.ThrowIfCancellationRequested();
-                mwvm.PrgTitle = $"＜削除対象リストアップ中＞";
-                var delList = ExistDestPathsList
-                    .Select(destPath =>
-                    (
-                        dir: destPath,
-                        files:
-                            (SkipExclamation ?
-                                FileUtils.GetAllFiles(destPath) :
-                                Directory.EnumerateFiles(destPath, "*", System.IO.SearchOption.AllDirectories))
-                            .Select(file => new FileData(OrigPath, destPath, file, false))
-                            .Where(file => file.IsDeletedFile)
-                            .ToArray()
-                    )).ToArray();
-
-                mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
+                //mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
                 var updList =
                     (SkipExclamation ?
                         FileUtils.GetAllFiles(OrigPath) :
@@ -100,55 +97,58 @@ namespace FileMirroringTool.Models
                             System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{path}");
                             return true; //ファイルが壊れている可能性？
                         }
-                    }).ToArray();
+                    });
 
-                mwvm.FileCnt_Target = delList.SelectMany(x => x.files).Count() + updList.Count() * ExistDestPathsList.Count();
+                foreach (var destPath_orig in ExistDestPathsList)
+                {
+                    mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath_orig}";
+                    var updList1 = updList.AsParallel().Select(file => new FileData(OrigPath, destPath_orig, file, true)).Where(x => x.IsNewFile || x.IsUpdatedFile);
+                    mwvm.FileCnt_Target = updList1.Count();
+                    updList1.ForAll(data =>
+                    {
+                        token.ThrowIfCancellationRequested();
+                        try
+                        {
+                            mwvm.PrgFileName = data.DestInfo.FullName;
+                            if (data.IsUpdatedFile && data.TryDupricateFile()) FileCounter.UpdCnt++;
+                            else if (data.IsNewFile && data.TryDupricateFile()) FileCounter.AddCnt++;
+                        }
+                        catch (Exception e)
+                        {
+                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{data.OrigInfo.FullName}");
+                        }
+                        mwvm.FileCnt_Checked++;
+                    });
+                }
 
+                //mwvm.PrgTitle = $"＜削除対象リストアップ中＞";
+                mwvm.ResetPrgStat();
+                var delList = ExistDestPathsList
+                    .Select(destPath =>
+                    (
+                        dir: destPath,
+                        files:
+                            (SkipExclamation ?
+                                FileUtils.GetAllFiles(destPath) :
+                                Directory.EnumerateFiles(destPath, "*", System.IO.SearchOption.AllDirectories))
+                            .Select(file => new FileData(OrigPath, destPath, file, false))
+                            .Where(file => file.IsDeletedFile)
+                    ));
+                mwvm.FileCnt_Target = delList.Sum(x => x.files.Count());
                 foreach (var (dir, files) in delList)
                 {
-                    mwvm.PrgTitle = $"＜削除中＞{OrigPath} -> {dir}";
-                    foreach (var file in files)
+                    mwvm.PrgTitle = $"＜削除中＞{dir}";
+                    files.AsParallel().ForAll(file =>
                     {
                         token.ThrowIfCancellationRequested();
                         mwvm.FileCnt_Checked++;
                         mwvm.PrgFileName = file.DestInfo.FullName;
                         if (file.TryDeleteDestFile())
                             FileCounter.DelCnt++;
-                    }
-                    //空フォルダの削除
-                    FileUtils.DeleteEmptyDirs(dir);
+                    });
                 }
-
-                foreach (var destPath_orig in ExistDestPathsList)
-                {
-                    var destPath = destPath_orig;
-                    mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath}";
-
-                    foreach (var file in updList)
-                    {
-                        token.ThrowIfCancellationRequested();
-                        mwvm.FileCnt_Checked++;
-                        try
-                        {
-                            var data = new FileData(OrigPath, destPath_orig, file, true);
-                            mwvm.PrgFileName = data.DestInfo.FullName;
-                            if (data.IsUpdatedFile)
-                            {
-                                if (data.TryDupricateFile()) FileCounter.UpdCnt++;
-                            }
-                            else if (data.IsNewFile)
-                            {
-                                if (data.TryDupricateFile()) FileCounter.AddCnt++;
-                            }
-                            else continue;
-
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file}");
-                        }
-                    }
-                }
+                ExistDestPathsList.SelectMany(dir=>Directory.EnumerateDirectories(dir,"*",SearchOption.AllDirectories))
+                    .OrderByDescending(x => x.Length).ToList().ForEach(dir => FileUtils.DeleteEmptyDirs(dir));
             }
             catch (Exception e)
             {

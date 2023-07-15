@@ -73,6 +73,7 @@ namespace FileMirroringTool.Models
 
         void DelDir(string dir)
         {
+            if (!Directory.Exists(dir)) return;
             if (Directory.EnumerateFileSystemEntries(dir, "*", System.IO.SearchOption.AllDirectories).Any()) return;
             try
             {
