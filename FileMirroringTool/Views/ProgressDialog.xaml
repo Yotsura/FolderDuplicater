@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FileMirroringTool"
         mc:Ignorable="d" Closing="Window_Closing"
         ResizeMode="NoResize"
-        Title="ミラーリング実行中" Height="250" Width="500">
+        Title="処理の実行中" Height="250" Width="500">
     <Grid Margin="20,20,20,15">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>

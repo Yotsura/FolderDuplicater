@@ -35,8 +35,7 @@ namespace FileMirroringTool.ViewModels.Commands
                 $"\r\n先頭バイトから拡張子を解析し正常な拡張子が設定されているか確認します。" +
                 $"\r\n一致しない場合は正常な拡張子に修正します。" +
                 $"\r\n対象フォルダ：" +
-                $"\r\n{_mwvm.OrigPath}", "実行結果" ,MessageBoxButton.OKCancel) == MessageBoxResult.Cancel) return;
-            _mwvm.ResetPrgStat();
+                $"\r\n\r\n{_mwvm.OrigPath}", "実行結果" ,MessageBoxButton.OKCancel) == MessageBoxResult.Cancel) return;
 
             var cancelTokenSource = new CancellationTokenSource();
             var cancelToken = cancelTokenSource.Token;
@@ -48,11 +47,13 @@ namespace FileMirroringTool.ViewModels.Commands
                 try
                 {
                     _mwvm.ResetPrgStat();
+                    _mwvm.PrgTitle = $"＜画像ファイル拡張子修正作業中＞{_mwvm.OrigPath}";
                     var target = Directory.EnumerateFiles(_mwvm.OrigPath, "*", SearchOption.AllDirectories).AsParallel().Where(x => x.IsImgFile());
                     _mwvm.FileCnt_Target = target.Count();
                     target.ForAll(path =>
                         {
                             if (cancelToken.IsCancellationRequested) return;
+                            _mwvm.PrgFileName = path;
                             if (path.ShouldFixImgFileExtension(out var fixedPath))
                             {
                                 File.Move(path, fixedPath);
