@@ -57,17 +57,6 @@ namespace FileMirroringTool.Models
 
         public void MirroringInvoke(MainWindowViewModel mwvm, CancellationToken token)
         {
-            //ipadから保存した場合、pngがjpegになってるのを修正
-            //var testPath = @"D:\DropboxStrage\Dropbox\水星の魔女";
-            //var testFiles = Directory.EnumerateFiles(testPath,"ファイル*.jpeg",SearchOption.AllDirectories);
-            //testFiles.AsParallel().ForAll(sourceFilePath =>
-            //{
-            //    var fileInfo = new FileInfo(sourceFilePath);
-            //    var destFile = fileInfo.Name.Replace("ファイル", "file").Replace(" ", "_").Replace("jpeg", "png");
-            //    var destFilePath = Path.Combine(fileInfo.DirectoryName,destFile);
-            //    fileInfo.MoveTo(destFilePath);
-            //});
-
             if (NeedBackup)
             {
                 mwvm.PrgTitle = $"＜バックアップ中＞{OrigPath}";

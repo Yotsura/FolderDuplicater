@@ -16,6 +16,7 @@ namespace FileMirroringTool.ViewModels
         public ICommand MirroringCommand { get; private set; }
         public ICommand OpenDialogCommand { get; private set; }
         public ICommand OpenExplorerCommand { get; private set; }
+        public ICommand FixExtensionCommand { get; private set; }
         public MainWindowViewModel()
         {
             MirrorListCtrlCommand = new MirrorListCtrl(this);
@@ -23,6 +24,7 @@ namespace FileMirroringTool.ViewModels
             MirroringCommand = new MirroringCtrl(this);
             OpenDialogCommand = new OpenDialogCtrl(this);
             OpenExplorerCommand = new OpenExplorer(this);
+            FixExtensionCommand = new FixExtensionsCtrl(this);
             if (Settings.Default.MirrorList != null)
                 MirrorList = new ObservableCollection<MirrorInfo>(Settings.Default.MirrorList);
         }

@@ -43,6 +43,10 @@
                         Command="{Binding MirroringCommand}"
                         CommandParameter="manual"/>
                 </MenuItem>
+                <MenuItem Header="ツール(_T)">
+                    <MenuItem Header="Sourceフォルダ内画像の拡張子修正を実行"
+                        Command="{Binding FixExtensionCommand}"/>
+                </MenuItem>
                 <MenuItem Header="ヘルプ(_H)">
                     <MenuItem Header="バージョン情報"/>
                 </MenuItem>
