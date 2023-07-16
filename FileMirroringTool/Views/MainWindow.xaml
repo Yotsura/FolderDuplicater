@@ -202,7 +202,7 @@
                                   CommandParameter="{Binding SelectedBackupFile,Converter={StaticResource FileInfoConverter}}"/>
                     </DataGrid.InputBindings>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="LastWriteTime" Width="140" CanUserResize="False"
+                        <DataGridTextColumn Header="LastWriteTime" Width="150" CanUserResize="False"
                                                 Binding="{Binding LastWriteTime,Mode=OneWay ,Converter={StaticResource DateConverter}}"/>
                         <DataGridTextColumn Header="Path" Width="*" CanUserResize="False"
                                                 Binding="{Binding FullName,Mode=OneWay ,Converter={StaticResource FileNameConverter}}"/>
