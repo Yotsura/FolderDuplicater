@@ -23,8 +23,8 @@ namespace FileMirroringTool.ViewModels.Commands
             switch (parameter.ToString())
             {
                 case "save":
-                    var list1 = _mwvm.MirrorList.OrderBy(x=>x.ID).ToList();
-                    var list2 = Settings.Default.MirrorList.OrderBy(x=>x.ID).ToList();
+                    var list1 = _mwvm.MirrorList.OrderBy(x => x.ID).ToList();
+                    var list2 = Settings.Default.MirrorList.OrderBy(x => x.ID).ToList();
                     var result = !list1.SequenceEqual(list2);
                     return result;
                 case "reload":

@@ -44,5 +44,10 @@ namespace FileMirroringTool.Views
             // 貼り付けを禁止します。
             e.Handled = e.Command == ApplicationCommands.Paste;
         }
+
+        private void CheckBox_CheckChangeed(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.Save();
+        }
     }
 }
