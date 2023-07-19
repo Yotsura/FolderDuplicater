@@ -216,6 +216,7 @@
     <Compile Include="Utils\BackUpUtils.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ViewModels\Commands\FixExtensionsCtrl.cs" />
+    <Compile Include="ViewModels\Commands\SingleMirroringCtrl .cs" />
     <Compile Include="ViewModels\Commands\MirrorListCtrl.cs" />
     <Compile Include="ViewModels\Commands\MirroringCtrl.cs" />
     <Compile Include="ViewModels\Commands\OpenDialogCtrl.cs" />

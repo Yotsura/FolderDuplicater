@@ -31,7 +31,6 @@ namespace FileMirroringTool.ViewModels.Commands
 
         public void Execute(object parameter)
         {
-            _mwvm.FileCnt_Checked = 0;
             Settings.Default.MirrorList = _mwvm.MirrorList.ToList();
             Settings.Default.Save();
 

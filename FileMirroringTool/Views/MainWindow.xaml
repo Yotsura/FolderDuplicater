@@ -129,6 +129,9 @@
                 SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
                 ItemsSource="{Binding Source={StaticResource NowDataView}}"
                 Name="MainDataGrid">
+                <DataGrid.InputBindings>
+                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding SingleMirroringCommand}"/>
+                </DataGrid.InputBindings>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="60" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
