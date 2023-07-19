@@ -147,8 +147,20 @@
                                         Binding="{Binding NeedBackup,Mode=OneWay,Converter={StaticResource BoolToOnOffConverter}}"/>
                     <DataGridTextColumn Header="Skip[!*]s" Width="85" CanUserResize="False"
                                         Binding="{Binding SkipExclamation,Mode=OneWay,Converter={StaticResource BoolToOnOffConverter}}"/>
-                    <DataGridTextColumn Header="Mirror Source" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Mirror Destination" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}"/>
+                    <DataGridTextColumn Header="Mirror Source" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="ToolTip" Value="{Binding OrigPath}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Mirror Destination" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="ToolTip" Value="{Binding DestPathsStr}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
             <Grid Margin="0,5,0,0" Grid.Row="6">
