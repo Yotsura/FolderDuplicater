@@ -80,7 +80,7 @@ namespace FileMirroringTool.Models
             if (backups.Count < 1)
             {
                 //初回バックアップ
-                var newpath = GetBackupFilePath("0000");
+                var newpath = GetBackupFilePath(OrigFile.LastWriteTime.Year.ToString());
                 OrigFile.SafeCopyTo(newpath);
             }
             else if (backups.Last().LastWriteTime < OrigFile.LastWriteTime)
@@ -102,8 +102,8 @@ namespace FileMirroringTool.Models
                     //1ヶ月以上経過しているファイル名を_yyyyMMに変更する。
                     file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMM")), true);
                 else if (file.CreationTime < runtime.AddMonths(-3))
-                    //3ヶ月以上経過しているファイル名を_0000に変更する。
-                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("0000")), true);
+                    //3ヶ月以上経過しているファイル名を_yyyyに変更する。
+                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyy")), true);
             }
         }
     }
