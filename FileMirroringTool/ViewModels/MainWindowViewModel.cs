@@ -60,8 +60,8 @@ namespace FileMirroringTool.ViewModels
                 OnPropertyChanged(nameof(SearchFile));
                 if (!string.IsNullOrEmpty(_searchFile) && new FileInfo(_searchFile).Exists)
                 {
-                    var files = new BackupFile(OrigPath, _searchFile);
-                    var list = new ObservableCollection<FileInfo>(files.ExistsBackUpFiles);
+                    var files = new BackupInfo(OrigPath, _searchFile);
+                    var list = new ObservableCollection<FileInfo>(files.GetBackupList(false));
                     BackUpFileList = list;
                 }
                 else

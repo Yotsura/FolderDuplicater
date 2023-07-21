@@ -212,9 +212,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="Models\BackupInfo.cs" />
+    <Compile Include="Models\BackupManager.cs" />
     <Compile Include="Models\FileCount.cs" />
-    <Compile Include="Utils\BackUpUtils.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ViewModels\Commands\FixExtensionsCtrl.cs" />
     <Compile Include="ViewModels\Commands\SingleMirroringCtrl .cs" />

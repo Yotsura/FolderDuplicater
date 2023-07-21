@@ -15,7 +15,7 @@ namespace FileMirroringTool.Models
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
         public bool SkipExclamation { get; set; } = false;
         public bool NeedBackup { get; set; } = false;
-        public BackupInfo BackupInfo => new BackupInfo(OrigPath, SkipExclamation);
+        public BackupManager BackupInfo => new BackupManager(OrigPath, SkipExclamation);
 
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;

@@ -112,5 +112,65 @@ namespace FileMirroringTool.Utils
 
             return string.Empty;
         }
+
+        /// <summary>
+        /// 使用中のファイル含め、ロックしないようにsourceFileでdestFileを上書きします。ディレクトリが存在しなければ作成します。
+        /// </summary>
+        public static void SafeCopyTo(this FileInfo sourceFileInfo, string destFilePath)
+            => sourceFileInfo.SafeCopyTo(new FileInfo(destFilePath));
+
+        /// <summary>
+        /// 使用中のファイル含め、ロックしないようにsourceFileでdestFileを上書きします。ディレクトリが存在しなければ作成します。
+        /// </summary>
+        public static void SafeCopyTo(this FileInfo sourceFileInfo, FileInfo destFileInfo)
+        {
+            if (!sourceFileInfo.Exists) return;
+            try
+            {
+                // 操作中のファイルをロックせずにコピーするため、FileStreamを使う
+                using (FileStream sourceStream = new FileStream(sourceFileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    // コピー先のフォルダが存在しない場合は作成する
+                    if (!Directory.Exists(destFileInfo.DirectoryName))
+                    {
+                        Directory.CreateDirectory(destFileInfo.DirectoryName);
+                    }
+
+                    // ファイルをコピー
+                    using (FileStream destinationStream = new FileStream(destFileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            destinationStream.Write(buffer, 0, bytesRead);
+                        }
+                    }
+                }
+
+                Console.WriteLine("ファイルのコピーが成功しました。");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"ファイルのコピー中にエラーが発生しました: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// sourceFileをdestFileの位置へ移動します。destPathにファイルが存在する場合、overwiteがオンの場合に上書きします。sourceFileとdestFileが同じファイルを指定している場合、処理を行いません。
+        /// </summary>
+        public static void MoveTo(this FileInfo sourceFile ,string destFilePath , bool overwrite)
+        {
+            if (sourceFile.FullName == destFilePath)
+                return;
+            if (File.Exists(destFilePath))
+            {
+                if (overwrite)
+                    File.Delete(destFilePath);
+                else
+                    return;
+            }
+            sourceFile.MoveTo(destFilePath);
+        }
     }
 }
