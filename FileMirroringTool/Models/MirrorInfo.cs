@@ -15,7 +15,7 @@ namespace FileMirroringTool.Models
         public int SortPara => Sort > 0 ? (-Sort) : ID; //sortがある場合は無いものより前に設定
         public bool SkipExclamation { get; set; } = false;
         public bool NeedBackup { get; set; } = false;
-        public BackupManager BackupInfo => new BackupManager(OrigPath, SkipExclamation);
+        public BackupManager BackupInfo => new BackupManager(OrigPath);
 
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
@@ -60,7 +60,7 @@ namespace FileMirroringTool.Models
             if (NeedBackup)
             {
                 mwvm.PrgTitle = $"＜バックアップ中＞{OrigPath}";
-                BackupInfo.RunAllBackup();
+                BackupInfo.RunAllBackup(SkipExclamation);
             }
 
             FileCounter = new FileCount();
@@ -70,7 +70,7 @@ namespace FileMirroringTool.Models
                 //mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
                 var updList =
                     (SkipExclamation ?
-                        FileUtils.GetAllFiles(OrigPath) :
+                        FileUtils.GetAllFiles_skipExclamation(OrigPath) :
                         Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories))
                     .Where(path =>
                     {
@@ -120,7 +120,7 @@ namespace FileMirroringTool.Models
                         dir: destPath,
                         files:
                             (SkipExclamation ?
-                                FileUtils.GetAllFiles(destPath) :
+                                FileUtils.GetAllFiles_skipExclamation(destPath) :
                                 Directory.EnumerateFiles(destPath, "*", System.IO.SearchOption.AllDirectories))
                             .Select(file => new FileData(OrigPath, destPath, file, false))
                             .Where(file => file.IsDeletedFile)

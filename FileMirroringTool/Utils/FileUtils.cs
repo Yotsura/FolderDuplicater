@@ -39,16 +39,19 @@ namespace FileMirroringTool.Utils
         /// <summary>
         /// 指定ディレクトリ以下で!で始まらないファイル/フォルダ以外すべて取得
         /// </summary>
-        public static string[] GetAllFiles(this string targetDirectory)
+        public static IEnumerable<string> GetAllFiles_skipExclamation(this string targetDirectory, string pattern = "*")
         {
-            var dirs = Directory.EnumerateDirectories(targetDirectory, "*", SearchOption.TopDirectoryOnly)
-                .Where(path => !path.Replace(targetDirectory, string.Empty).Contains(@"\!")).ToArray();
-            var files = Directory.EnumerateFiles(targetDirectory, "*", SearchOption.TopDirectoryOnly).ToArray();
-            if (files.Length < 1 && dirs.Length < 1)
-                return files;
-            var children = dirs.Select(dir => GetAllFiles(dir)).SelectMany(x => x).ToArray();
-            var result = files.Concat(children).ToArray();
-            return result;
+            return Directory.EnumerateFiles(targetDirectory, pattern, SearchOption.AllDirectories)
+                .Where(path => !path.Substring(targetDirectory.Length).Contains(@"\!"));
+        }
+
+        /// <summary>
+        /// 指定ディレクトリ以下で!で始まらないファイル/フォルダ以外すべて取得
+        /// </summary>
+        public static IEnumerable<FileInfo> GetAllFileInfos_skipExclamation(this DirectoryInfo targetDirectory, string pattern = "*")
+        {
+            return targetDirectory.EnumerateFiles(pattern, SearchOption.AllDirectories)
+                .Where(file => !file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!"));
         }
 
         /// <summary>

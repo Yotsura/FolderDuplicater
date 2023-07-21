@@ -12,7 +12,7 @@ namespace FileMirroringTool.Models
         public DirectoryInfo TargetDirectory { get; set; }
         public DirectoryInfo BackUpDirectory { get; set; }
 
-        public BackupManager(string targetDirPath, bool skipExclamation)
+        public BackupManager(string targetDirPath)
         {
             if (targetDirPath.IsNullOrEmpty()) return;
             TargetDirectory = new DirectoryInfo(targetDirPath);
@@ -20,10 +20,12 @@ namespace FileMirroringTool.Models
             BackUpDirectory = new DirectoryInfo(Path.Combine(TargetDirectory.Parent.FullName, $"!Backup_{TargetDirectory.Name}"));
         }
 
-        public void RunAllBackup()
+        public void RunAllBackup(bool skipExclamation = false)
         {
-            TargetDirectory.EnumerateFiles("*", SearchOption.AllDirectories)
-            .ToList().ForEach(file => new BackupInfo(TargetDirectory, file).RunBackup());
+            var files = skipExclamation ?
+                TargetDirectory.GetAllFileInfos_skipExclamation():
+                TargetDirectory.EnumerateFiles("*", SearchOption.AllDirectories);
+            files.ToList().ForEach(file => new BackupInfo(TargetDirectory, file).RunBackup(skipExclamation));
         }
     }
 
@@ -55,22 +57,26 @@ namespace FileMirroringTool.Models
 
         }
 
-        public List<FileInfo> GetBackupList(bool isAscending = true)
+        public List<FileInfo> GetBackupList(bool isAscending = true, bool skipExclamation = false)
         {
             if (!BackUpDirInfo.Exists)
                 return new List<FileInfo>();
             var fileName = Path.GetFileNameWithoutExtension(OrigFile.Name);
-            var backups = BackUpDirInfo.EnumerateFiles($"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*", SearchOption.TopDirectoryOnly);
+            var pattern = $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*";
+            var backups =
+                skipExclamation ?
+                BackUpDirInfo.GetAllFileInfos_skipExclamation() :
+                BackUpDirInfo.EnumerateFiles(pattern, SearchOption.TopDirectoryOnly);
             return
                 isAscending ?
                 backups.OrderBy(x => x.CreationTime).ToList() :
                 backups.OrderByDescending(x => x.CreationTime).ToList();
         }
 
-        public void RunBackup()
+        public void RunBackup(bool skipExclamation = false)
         {
             var runtime = DateTime.Now;
-            var backups = GetBackupList();
+            var backups = GetBackupList(true, skipExclamation);
             if (backups.Count < 1)
             {
                 //初回バックアップ
