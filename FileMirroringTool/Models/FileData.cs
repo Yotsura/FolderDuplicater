@@ -1,7 +1,7 @@
-﻿using MS.WindowsAPICodePack.Internal;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using FileMirroringTool.Extensions;
 
 namespace FileMirroringTool.Models
 {
@@ -25,12 +25,12 @@ namespace FileMirroringTool.Models
             if (isOrig)
             {
                 OrigInfo = new FileInfo(filepath);
-                DestInfo = new FileInfo(OrigInfo.FullName.Replace(origPath, destPath));
+                DestInfo = new FileInfo(filepath.GetRelativePath(origPath, destPath));
             }
             else
             {
                 DestInfo = new FileInfo(filepath);
-                OrigInfo = new FileInfo(DestInfo.FullName.Replace(destPath, origPath));
+                OrigInfo = new FileInfo(filepath.GetRelativePath(destPath, origPath));
             }
         }
 
