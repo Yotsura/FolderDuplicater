@@ -1,4 +1,5 @@
-﻿using FileMirroringTool.Utils;
+﻿using FileMirroringTool.Extensions;
+using FileMirroringTool.Utils;
 using FileMirroringTool.Views;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,7 @@ namespace FileMirroringTool.ViewModels.Commands
             var cancelToken = cancelTokenSource.Token;
             cancelToken.ThrowIfCancellationRequested();
 
+            var checkeFiles = new List<string>();
             var fixeImgs = new List<string>();
             var pd = new ProgressDialog(_mwvm, () =>
             {
@@ -48,28 +50,34 @@ namespace FileMirroringTool.ViewModels.Commands
                 {
                     _mwvm.ResetPrgStat();
                     _mwvm.PrgTitle = $"＜画像ファイル拡張子修正作業中＞{_mwvm.OrigPath}";
-                    var target = Directory.EnumerateFiles(_mwvm.OrigPath, "*", SearchOption.AllDirectories).AsParallel().Where(x => x.IsImgFile());
+                    var target = Directory.EnumerateFiles(_mwvm.OrigPath, "*", SearchOption.AllDirectories).Except(Settings.Default.CheckedFilePaths).Where(x => x.IsImgFile());
                     _mwvm.FileCnt_Target = target.Count();
-                    target.ForAll(path =>
+                    checkeFiles = target.Select(path =>
+                    {
+                        if (cancelToken.IsCancellationRequested)
+                            return string.Empty;
+                        _mwvm.PrgFileName = path;
+                        _mwvm.FileCnt_Checked++;
+                        if (path.ShouldFixImgFileExtension(out var fixedPath))
                         {
-                            if (cancelToken.IsCancellationRequested) return;
-                            _mwvm.PrgFileName = path;
-                            if (path.ShouldFixImgFileExtension(out var fixedPath))
-                            {
-                                File.Move(path, fixedPath);
-                                fixeImgs.Add(fixedPath);
-                            }
-                            _mwvm.FileCnt_Checked++;
-                        });
+                            File.Move(path, fixedPath);
+                            fixeImgs.Add(fixedPath);
+                            return fixedPath;
+                        }
+                        else
+                            return path;
+                    }).Where(x => !x.IsNullOrEmpty()).ToList();
                 }
                 catch (Exception e)
                 {
                     System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}");
                 }
+
+                Settings.Default.CheckedFilePaths = Settings.Default.CheckedFilePaths.Where(x => File.Exists(x)).Concat(checkeFiles).Distinct().ToList();
+                Settings.Default.Save();
             }, cancelTokenSource, false);
             pd.ShowDialog();
-
-            MessageBox.Show($"拡張子チェックが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n修正済件数：{fixeImgs.Count}件","実行結果");
+            MessageBox.Show($"拡張子チェックが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n修正済件数：{fixeImgs.Count}件", "実行結果");
             cancelTokenSource.Dispose();
         }
     }

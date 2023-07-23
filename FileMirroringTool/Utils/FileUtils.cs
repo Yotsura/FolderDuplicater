@@ -48,10 +48,13 @@ namespace FileMirroringTool.Utils
         /// <summary>
         /// 指定ディレクトリ以下で!で始まらないファイル/フォルダ以外すべて取得
         /// </summary>
-        public static IEnumerable<FileInfo> GetAllFileInfos_skipExclamation(this DirectoryInfo targetDirectory, string pattern = "*")
+        public static IEnumerable<FileInfo> GetAllFileInfos(this DirectoryInfo targetDirectory, string pattern = "*"
+            ,SearchOption searchOption = SearchOption.TopDirectoryOnly , bool skipExclamation = false)
         {
-            return targetDirectory.EnumerateFiles(pattern, SearchOption.AllDirectories)
-                .Where(file => !file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!"));
+            var files = targetDirectory.EnumerateFiles(pattern, searchOption);
+            return skipExclamation ?
+                files.Where(file => !file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!"))
+                : files;
         }
 
         /// <summary>

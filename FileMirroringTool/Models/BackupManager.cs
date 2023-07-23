@@ -22,9 +22,7 @@ namespace FileMirroringTool.Models
 
         public void RunAllBackup(bool skipExclamation = false)
         {
-            var files = skipExclamation ?
-                TargetDirectory.GetAllFileInfos_skipExclamation():
-                TargetDirectory.EnumerateFiles("*", SearchOption.AllDirectories);
+            var files = TargetDirectory.GetAllFileInfos("*", SearchOption.AllDirectories, skipExclamation);
             files.ToList().ForEach(file => new BackupInfo(TargetDirectory, file).RunBackup(skipExclamation));
         }
     }
@@ -63,10 +61,7 @@ namespace FileMirroringTool.Models
                 return new List<FileInfo>();
             var fileName = Path.GetFileNameWithoutExtension(OrigFile.Name);
             var pattern = $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*";
-            var backups =
-                skipExclamation ?
-                BackUpDirInfo.GetAllFileInfos_skipExclamation() :
-                BackUpDirInfo.EnumerateFiles(pattern, SearchOption.TopDirectoryOnly);
+            var backups = BackUpDirInfo.GetAllFileInfos(pattern, SearchOption.TopDirectoryOnly, skipExclamation);
             return
                 isAscending ?
                 backups.OrderBy(x => x.CreationTime).ToList() :
