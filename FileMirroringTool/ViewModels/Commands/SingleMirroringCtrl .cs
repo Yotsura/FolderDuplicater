@@ -28,6 +28,8 @@ namespace FileMirroringTool.ViewModels.Commands
 
         public void Execute(object param)
         {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
             Settings.Default.MirrorList = _mwvm.MirrorList.ToList();
             Settings.Default.Save();
 
@@ -44,8 +46,10 @@ namespace FileMirroringTool.ViewModels.Commands
             }, cancelTokenSource, false);
             pd.ShowDialog();
 
+            sw.Stop();
+
             var result = $"【ID：{mirror.ID}（backup：{(mirror.NeedBackup ? "on" : "off")}）】{mirror.FileCounter.CntInfoStr}";
-            System.Windows.MessageBox.Show($"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}");
+            System.Windows.MessageBox.Show($"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}\r\n実行時間：{sw.Elapsed}");
             cancelTokenSource.Dispose();
         }
     }

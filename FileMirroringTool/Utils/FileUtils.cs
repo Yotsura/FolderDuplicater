@@ -13,7 +13,7 @@ namespace FileMirroringTool.Utils
                 throw new ArgumentException(
                     "Starting directory is a null reference or an empty string",
                     "dir");
-
+            if (!Directory.Exists(dir)) return;
             try
             {
                 foreach (var d in Directory.EnumerateDirectories(dir))
@@ -39,19 +39,25 @@ namespace FileMirroringTool.Utils
         /// <summary>
         /// 指定ディレクトリ以下で!で始まらないファイル/フォルダ以外すべて取得
         /// </summary>
-        public static IEnumerable<string> GetAllFiles_skipExclamation(this string targetDirectory, string pattern = "*")
-        {
-            return Directory.EnumerateFiles(targetDirectory, pattern, SearchOption.AllDirectories)
-                .Where(path => !path.Substring(targetDirectory.Length).Contains(@"\!"));
-        }
-
-        /// <summary>
-        /// 指定ディレクトリ以下で!で始まらないファイル/フォルダ以外すべて取得
-        /// </summary>
         public static IEnumerable<FileInfo> GetAllFileInfos(this DirectoryInfo targetDirectory, string pattern = "*"
             ,SearchOption searchOption = SearchOption.TopDirectoryOnly , bool skipExclamation = false)
         {
-            var files = targetDirectory.EnumerateFiles(pattern, searchOption);
+            var files = targetDirectory.EnumerateFiles(pattern, searchOption).Where(file =>
+            {
+                try
+                {
+                    var attr = file.Attributes;
+                    //隠しファイル・システムファイルを除外
+                    if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
+                    if ((attr & FileAttributes.System) == FileAttributes.System) return false;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file.FullName}");
+                    return true; //ファイルが壊れている可能性？
+                }
+            }).ToList();
             return skipExclamation ?
                 files.Where(file => !file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!"))
                 : files;

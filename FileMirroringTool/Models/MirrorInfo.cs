@@ -68,32 +68,15 @@ namespace FileMirroringTool.Models
             {
                 token.ThrowIfCancellationRequested();
                 //mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
-                var updList =
-                    (SkipExclamation ?
-                        FileUtils.GetAllFiles_skipExclamation(OrigPath) :
-                        Directory.EnumerateFiles(OrigPath, "*", System.IO.SearchOption.AllDirectories))
-                    .Where(path =>
-                    {
-                        try
-                        {
-                            var attr = File.GetAttributes(path);
-                            if ((attr & FileAttributes.Hidden) == FileAttributes.Hidden) return false;
-                            if ((attr & FileAttributes.System) == FileAttributes.System) return false;
-                            return true;
-                        }
-                        catch(Exception e)
-                        {
-                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{path}");
-                            return true; //ファイルが壊れている可能性？
-                        }
-                    });
+                var fileList = new DirectoryInfo(OrigPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation).ToArray();
 
                 foreach (var destPath_orig in ExistDestPathsList)
                 {
                     mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath_orig}";
-                    var updList1 = updList.AsParallel().Select(file => new FileData(OrigPath, destPath_orig, file, true)).Where(x => x.IsNewFile || x.IsUpdatedFile);
+                    var updList1 = fileList.Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).Where(x => x.IsNewFile || x.IsUpdatedFile);
                     mwvm.FileCnt_Target = updList1.Count();
-                    updList1.ForAll(data =>
+                    mwvm.FileCnt_Checked = 0;
+                    updList1.AsParallel().ForAll(data =>
                     {
                         token.ThrowIfCancellationRequested();
                         try
@@ -119,11 +102,9 @@ namespace FileMirroringTool.Models
                     (
                         dir: destPath,
                         files:
-                            (SkipExclamation ?
-                                FileUtils.GetAllFiles_skipExclamation(destPath) :
-                                Directory.EnumerateFiles(destPath, "*", System.IO.SearchOption.AllDirectories))
-                            .Select(file => new FileData(OrigPath, destPath, file, false))
-                            .Where(file => file.IsDeletedFile)
+                            new DirectoryInfo(destPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation)
+                            .Select(file => new FileData(OrigPath, destPath, file.FullName, false))
+                            .Where(file => file.IsDeletedFile).ToArray()
                     ));
                 mwvm.FileCnt_Target = delList.Sum(x => x.files.Count());
                 foreach (var (dir, files) in delList)
@@ -138,8 +119,11 @@ namespace FileMirroringTool.Models
                             FileCounter.DelCnt++;
                     });
                 }
-                ExistDestPathsList.SelectMany(dir=>Directory.EnumerateDirectories(dir,"*",SearchOption.AllDirectories))
-                    .OrderByDescending(x => x.Length).ToList().ForEach(dir => FileUtils.DeleteEmptyDirs(dir));
+                mwvm.PrgTitle = $"＜空ディレクトリ削除中＞";
+
+                ExistDestPathsList.ForEach(x => FileUtils.DeleteEmptyDirs(x));
+                //ExistDestPathsList.SelectMany(dir => Directory.EnumerateDirectories(dir, "*", SearchOption.AllDirectories))
+                //    .OrderBy(x => x.Length).ToList().ForEach(dir => FileUtils.DeleteEmptyDirs(dir));
             }
             catch (Exception e)
             {
