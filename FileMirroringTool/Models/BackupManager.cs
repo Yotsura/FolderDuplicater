@@ -87,18 +87,18 @@ namespace FileMirroringTool.Models
             while (buffer.Any())
             {
                 var file = buffer.Dequeue();
-                if (file.CreationTime < runtime.AddHours(-1))
-                    //1時間以上経過しているファイル名を_yyyyMMddHHに変更する。
-                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMMddHH")), true);
-                else if (file.CreationTime < runtime.AddHours(-48))
-                    //48時間以上経過しているファイル名を_yyyyMMddに変更する。
-                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMMdd")), true);
-                else if (file.CreationTime < runtime.AddMonths(-1))
-                    //1ヶ月以上経過しているファイル名を_yyyyMMに変更する。
-                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMM")), true);
-                else if (file.CreationTime < runtime.AddMonths(-3))
+                if (file.CreationTime.AddMonths(3) < runtime)
                     //3ヶ月以上経過しているファイル名を_yyyyに変更する。
                     file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyy")), true);
+                else if (file.CreationTime.AddMonths(1) < runtime)
+                    //1ヶ月以上経過しているファイル名を_yyyyMMに変更する。
+                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMM")), true);
+                else if (file.CreationTime.AddHours(48) < runtime)
+                    //48時間以上経過しているファイル名を_yyyyMMddに変更する。
+                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMMdd")), true);
+                else if (file.CreationTime.AddHours(1) < runtime)
+                    //1時間以上経過しているファイル名を_yyyyMMddHHに変更する。
+                    file.MoveTo(GetBackupFilePath(file.CreationTime.ToString("yyyyMMddHH")), true);
             }
         }
     }
