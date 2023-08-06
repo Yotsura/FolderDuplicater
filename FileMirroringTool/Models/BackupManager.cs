@@ -83,7 +83,7 @@ namespace FileMirroringTool.Models
                 var newpath = GetBackupFilePath(runtime.ToString("yyyyMMddHHmm"));
                 OrigFile.SafeCopyTo(newpath);
             }
-            var buffer = new Queue<FileInfo>(backups.Skip(1));
+            var buffer = new Queue<FileInfo>(backups);
             while (buffer.Any())
             {
                 var file = buffer.Dequeue();
