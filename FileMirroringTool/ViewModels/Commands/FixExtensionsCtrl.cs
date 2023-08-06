@@ -35,6 +35,7 @@ namespace FileMirroringTool.ViewModels.Commands
             if (MessageBox.Show($"Sourceフォルダ内の画像ファイルについて、" +
                 $"\r\n先頭バイトから拡張子を解析し正常な拡張子が設定されているか確認します。" +
                 $"\r\n一致しない場合は正常な拡張子に修正します。" +
+                $"\r\n!フォルダはスキップします。" +
                 $"\r\n対象フォルダ：" +
                 $"\r\n\r\n{_mwvm.OrigPath}", "実行結果" ,MessageBoxButton.OKCancel) == MessageBoxResult.Cancel) return;
 
@@ -50,7 +51,9 @@ namespace FileMirroringTool.ViewModels.Commands
                 {
                     _mwvm.ResetPrgStat();
                     _mwvm.PrgTitle = $"＜画像ファイル拡張子修正作業中＞{_mwvm.OrigPath}";
-                    var target = Directory.EnumerateFiles(_mwvm.OrigPath, "*", SearchOption.AllDirectories).Except(Settings.Default.CheckedFilePaths).Where(x => x.IsImgFile());
+
+                    var target = new DirectoryInfo(_mwvm.OrigPath).GetAllFileInfos("*", SearchOption.AllDirectories, true).Select(x => x.FullName)
+                        .Except(Settings.Default.CheckedFilePaths).Where(x => x.IsImgFile());
                     _mwvm.FileCnt_Target = target.Count();
                     checkeFiles = target.Select(path =>
                     {
