@@ -33,7 +33,7 @@ namespace FileMirroringTool.Models
 
         public DirectoryInfo RootTargetDirInfo { get; set; }
         public DirectoryInfo RootBackupDirInfo { get; set; }
-        
+
         DirectoryInfo BackUpDirInfo { get; set; }
 
         string GetBackupFilePath(string dateStr)
@@ -72,17 +72,9 @@ namespace FileMirroringTool.Models
         {
             var runtime = DateTime.Now;
             var backups = GetBackupList(true, skipExclamation);
-            if (backups.Count < 1)
-            {
-                //初回バックアップ
-                var newpath = GetBackupFilePath(OrigFile.LastWriteTime.Year.ToString());
-                OrigFile.SafeCopyTo(newpath);
-            }
-            else if (backups.Last().LastWriteTime < OrigFile.LastWriteTime)
-            {
-                var newpath = GetBackupFilePath(runtime.ToString("yyyyMMddHHmm"));
-                OrigFile.SafeCopyTo(newpath);
-            }
+            //初回or最後のバックアップより更新されている場合は現状のファイルをバックアップに追加する。
+            if (backups.Count < 1 || backups.Last().LastWriteTime < OrigFile.LastWriteTime)
+                OrigFile.SafeCopyTo(GetBackupFilePath(runtime.ToString("yyyyMMddHHmm")));
             var buffer = new Queue<FileInfo>(backups);
             while (buffer.Any())
             {
