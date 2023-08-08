@@ -129,6 +129,11 @@
                 SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
                 ItemsSource="{Binding Source={StaticResource NowDataView}}"
                 Name="MainDataGrid">
+                <DataGrid.CellStyle>
+                    <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                        <Setter Property="BorderThickness" Value="0" />
+                    </Style>
+                </DataGrid.CellStyle>
                 <DataGrid.InputBindings>
                     <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding SingleMirroringCommand}"/>
                 </DataGrid.InputBindings>
