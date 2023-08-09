@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace FileMirroringTool.Views
@@ -19,8 +20,11 @@ namespace FileMirroringTool.Views
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed) return;
-            if (MainDataGrid.SelectedIndex > -1)
-                MainDataGrid.UnselectAll();
+            if (MainDataGrid.SelectedIndex < 0) return;
+            //DataGrid内のアイテムがクリックされた場合はreturn
+            var dgRowCtrl = (DataGridRow)MainDataGrid.ItemContainerGenerator.ContainerFromItem(MainDataGrid.SelectedItem);
+            if (dgRowCtrl?.InputHitTest(e.GetPosition(dgRowCtrl)) != null) return;
+            MainDataGrid.UnselectAll();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
