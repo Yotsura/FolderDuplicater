@@ -9,7 +9,7 @@ namespace FileMirroringTool.Utils
     {
         public static void DeleteEmptyDirs(this string dir)
         {
-            if (String.IsNullOrEmpty(dir))
+            if (string.IsNullOrEmpty(dir))
                 throw new ArgumentException(
                     "Starting directory is a null reference or an empty string",
                     "dir");
@@ -42,6 +42,7 @@ namespace FileMirroringTool.Utils
         public static IEnumerable<FileInfo> GetAllFileInfos(this DirectoryInfo targetDirectory, string pattern = "*"
             ,SearchOption searchOption = SearchOption.TopDirectoryOnly , bool skipExclamation = false)
         {
+            if (!targetDirectory.Exists) return Enumerable.Empty<FileInfo>();
             var files = targetDirectory.EnumerateFiles(pattern, searchOption).Where(file =>
             {
                 try
