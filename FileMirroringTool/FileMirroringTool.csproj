@@ -214,6 +214,7 @@
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Models\BackupManager.cs" />
     <Compile Include="Models\FileCount.cs" />
+    <Compile Include="Models\WindowStateInfo.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ViewModels\Commands\FixExtensionsCtrl.cs" />
     <Compile Include="ViewModels\Commands\SingleMirroringCtrl .cs" />

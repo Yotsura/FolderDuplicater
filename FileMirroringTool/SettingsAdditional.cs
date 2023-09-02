@@ -20,5 +20,21 @@ namespace FileMirroringTool
             get => ((List<string>)this[nameof(CheckedFilePaths)]) ?? new List<string>();
             set => this[nameof(CheckedFilePaths)] = value;
         }
+
+        [System.Configuration.UserScopedSetting()]
+        [System.Diagnostics.DebuggerNonUserCode()]
+        public WindowStateInfo MainWindowStateInfo
+        {
+            get => (WindowStateInfo)this[nameof(MainWindowStateInfo)] ?? new WindowStateInfo();
+            set => this[nameof(MainWindowStateInfo)] = value;
+        }
+
+        [System.Configuration.UserScopedSetting()]
+        [System.Diagnostics.DebuggerNonUserCode()]
+        public WindowStateInfo SubWindowStateInfo
+        {
+            get => (WindowStateInfo)this[nameof(SubWindowStateInfo)] ?? new WindowStateInfo();
+            set => this[nameof(SubWindowStateInfo)] = value;
+        }
     }
 }

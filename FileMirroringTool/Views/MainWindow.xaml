@@ -7,7 +7,8 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:converter="clr-namespace:FileMirroringTool.Views.ValueConverter"
         mc:Ignorable="d" MouseDown="Window_MouseDown"
-        Title="MirroringTool" Height="650" Width="900" MinHeight="900" MinWidth="900">
+        Title="MirroringTool" Height="650" Width="900" MinHeight="900" MinWidth="900"
+        Closing="SaveWindowStateInfo">
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
             <CollectionViewSource.SortDescriptions>

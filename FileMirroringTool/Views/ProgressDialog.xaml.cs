@@ -16,6 +16,7 @@ namespace FileMirroringTool.Views
         public ProgressDialog(MainWindowViewModel context, Action action, CancellationTokenSource cancelToken,bool isAuto)
         {
             InitializeComponent();
+            LoadWindowStateInfo();
             DataContext = context;
             _action = action;
             _cancelToken = cancelToken;
@@ -73,6 +74,18 @@ namespace FileMirroringTool.Views
         {
             _timer.Stop();
             if (!IsCompleted) _cancelToken.Cancel();
+            var set = new Models.WindowStateInfo(this);
+            Settings.Default.SubWindowStateInfo = set;
+            Settings.Default.Save();
+        }
+
+        private void LoadWindowStateInfo()
+        {
+            if (!Settings.Default.SubWindowStateInfo.HasSetting) return;
+            Top = Settings.Default.SubWindowStateInfo.Top;
+            Left = Settings.Default.SubWindowStateInfo.Left;
+            Width = Settings.Default.SubWindowStateInfo.Width;
+            Height = Settings.Default.SubWindowStateInfo.Height;
         }
     }
 }

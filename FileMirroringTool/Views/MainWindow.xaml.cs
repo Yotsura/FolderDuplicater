@@ -15,6 +15,7 @@ namespace FileMirroringTool.Views
             DataContext = new ViewModels.MainWindowViewModel();
             InitializeComponent();
             MainDataGrid.UnselectAll();
+            LoadWindowStateInfo();
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -51,6 +52,22 @@ namespace FileMirroringTool.Views
 
         private void CheckBox_CheckChangeed(object sender, RoutedEventArgs e)
         {
+            Settings.Default.Save();
+        }
+
+        private void LoadWindowStateInfo()
+        {
+            if (!Settings.Default.MainWindowStateInfo.HasSetting) return;
+            Top = Settings.Default.MainWindowStateInfo.Top;
+            Left = Settings.Default.MainWindowStateInfo.Left;
+            Width = Settings.Default.MainWindowStateInfo.Width;
+            Height = Settings.Default.MainWindowStateInfo.Height;
+        }
+
+        private void SaveWindowStateInfo(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var set = new Models.WindowStateInfo(this);
+            Settings.Default.MainWindowStateInfo = set;
             Settings.Default.Save();
         }
     }
