@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace FileMirroringTool.Models
 {
@@ -22,8 +23,36 @@ namespace FileMirroringTool.Models
 
         public void RunAllBackup(bool skipExclamation = false)
         {
-            var files = TargetDirectory.GetAllFileInfos("*", SearchOption.AllDirectories, skipExclamation);
-            files.ToList().ForEach(file => new BackupInfo(TargetDirectory, file).RunBackup(skipExclamation));
+            var files = TargetDirectory.GetAllFileInfos("*", SearchOption.AllDirectories, skipExclamation)
+                .Select(file => new BackupInfo(TargetDirectory, file)).ToList();
+            files.ForEach(backupinfo => backupinfo.RunBackup(skipExclamation));
+
+            //削除済みのファイルのバックアップも同様のリネーム処理したい。
+            //ターゲットフォルダのうち、fileのバックアップではないものを除外
+            var executedBackups = files.SelectMany(file => file.GetBackupList(true, skipExclamation)).ToList();
+            var allbackups = new BackupInfo(TargetDirectory).RootBackupDirInfo
+                .GetAllFileInfos("*", SearchOption.AllDirectories, skipExclamation);
+            var temp = allbackups.Where(x => executedBackups.All(y => x.FullName != y.FullName));
+
+            //ファイル名でグループ化して削除済みファイルパスを推測
+            foreach (var file in temp.GroupBy(x => OmitBackUpDate(x.FullName)))
+            {
+                var filename = file.Key.GetRelativePath(BackUpDirectory.FullName, TargetDirectory.FullName);
+                new BackupInfo(TargetDirectory, new FileInfo(filename)).RunBackup(skipExclamation);
+            }
+        }
+
+        string OmitBackUpDate(string backfilename)
+        {
+            var name = Path.GetFileNameWithoutExtension(backfilename);
+            if (!name.Contains("_")) return backfilename;
+            var extension = Path.GetExtension(backfilename);
+            var dir = Path.GetDirectoryName(backfilename);
+            var sp = name.Split('_');
+            var test = string.Join("_", sp.Take(sp.Length - 1));
+
+            var origfilename = Path.Combine(dir, $"{test}{extension}");
+            return origfilename;
         }
     }
 
@@ -38,7 +67,7 @@ namespace FileMirroringTool.Models
 
         string GetBackupFilePath(string dateStr)
             => Path.Combine(BackUpDirInfo.FullName, $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_{dateStr}{OrigFile.Extension}");
-        public BackupInfo(DirectoryInfo targetDir, FileInfo file)
+        public BackupInfo(DirectoryInfo targetDir, FileInfo file =null)
         {
             Initialize(targetDir, file);
         }
@@ -46,22 +75,27 @@ namespace FileMirroringTool.Models
         {
             Initialize(new DirectoryInfo(targetDirPath), new FileInfo(filePath));
         }
-        void Initialize(DirectoryInfo targetDir, FileInfo file)
+        void Initialize(DirectoryInfo targetDir, FileInfo file = null)
         {
-            OrigFile = file;
             RootTargetDirInfo = targetDir;
             RootBackupDirInfo = new DirectoryInfo(Path.Combine(RootTargetDirInfo.Parent.FullName, $"!Backup_{RootTargetDirInfo.Name}"));
-            BackUpDirInfo = new DirectoryInfo(file.DirectoryName.GetRelativePath(RootTargetDirInfo.FullName, RootBackupDirInfo.FullName));
-
+            if (file == null) return;
+            OrigFile = file;
+            BackUpDirInfo = new DirectoryInfo(OrigFile.DirectoryName.GetRelativePath(RootTargetDirInfo.FullName, RootBackupDirInfo.FullName));
         }
 
         public List<FileInfo> GetBackupList(bool isAscending = true, bool skipExclamation = false)
         {
             if (!BackUpDirInfo.Exists)
                 return new List<FileInfo>();
-            var fileName = Path.GetFileNameWithoutExtension(OrigFile.Name);
-            var pattern = $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*";
+            var pattern = OrigFile == null ? "*" : $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*";
             var backups = BackUpDirInfo.GetAllFileInfos(pattern, SearchOption.TopDirectoryOnly, skipExclamation);
+            if (OrigFile != null)
+            {
+                //元々ファイル名にアンダーバーがあると余計なものも取得してきてしまうので除外する。
+                var reg = new Regex(Path.GetFileNameWithoutExtension(OrigFile.Name) + @"_\d{4,12}\..+");
+                backups = backups.Where(x => reg.IsMatch(x.Name));
+            }
             return
                 isAscending ?
                 backups.OrderBy(x => x.CreationTime).ToList() :
