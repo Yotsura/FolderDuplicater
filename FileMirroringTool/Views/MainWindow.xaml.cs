@@ -58,10 +58,12 @@ namespace FileMirroringTool.Views
         private void LoadWindowStateInfo()
         {
             if (!Settings.Default.MainWindowStateInfo.HasSetting) return;
-            Top = Settings.Default.MainWindowStateInfo.Top;
-            Left = Settings.Default.MainWindowStateInfo.Left;
+
             Width = Settings.Default.MainWindowStateInfo.Width;
             Height = Settings.Default.MainWindowStateInfo.Height;
+            var isinscreen = Settings.Default.MainWindowStateInfo.IsInScrreen();
+            Left = isinscreen ? Settings.Default.MainWindowStateInfo.Left : 10;
+            Top = isinscreen ? Settings.Default.MainWindowStateInfo.Top : 10;
         }
 
         private void SaveWindowStateInfo(object sender, System.ComponentModel.CancelEventArgs e)

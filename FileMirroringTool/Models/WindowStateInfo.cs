@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Drawing;
+using System.Windows;
+using System.Windows.Forms;
 
 namespace FileMirroringTool.Models
 {
@@ -18,5 +20,16 @@ namespace FileMirroringTool.Models
         public double Left { get; set; } = 0;
         public double Width { get; set; } = 100;
         public double Height { get; set; } = 100;
+
+        internal bool IsInScrreen()
+        {
+            foreach (var screen in Screen.AllScreens)
+            {
+                var screenBounds = screen.Bounds;
+                var windowBounds = new Rectangle((int)Left, (int)Top, (int)Width, (int)Height);
+                if (screenBounds.Contains(windowBounds)) return true;
+            }
+            return false;
+        }
     }
 }

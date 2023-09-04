@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace FileMirroringTool.Views
 {
@@ -13,7 +12,7 @@ namespace FileMirroringTool.Views
     /// </summary>
     public partial class ProgressDialog : Window
     {
-        public ProgressDialog(MainWindowViewModel context, Action action, CancellationTokenSource cancelToken,bool isAuto)
+        public ProgressDialog(MainWindowViewModel context, Action action, CancellationTokenSource cancelToken, bool isAuto)
         {
             InitializeComponent();
             LoadWindowStateInfo();
@@ -82,10 +81,11 @@ namespace FileMirroringTool.Views
         private void LoadWindowStateInfo()
         {
             if (!Settings.Default.SubWindowStateInfo.HasSetting) return;
-            Top = Settings.Default.SubWindowStateInfo.Top;
-            Left = Settings.Default.SubWindowStateInfo.Left;
             Width = Settings.Default.SubWindowStateInfo.Width;
             Height = Settings.Default.SubWindowStateInfo.Height;
+            var isinscreen = Settings.Default.SubWindowStateInfo.IsInScrreen();
+            Top = isinscreen ? Settings.Default.SubWindowStateInfo.Top : 10;
+            Left = isinscreen ? Settings.Default.SubWindowStateInfo.Left : 10;
         }
     }
 }
