@@ -86,15 +86,16 @@ namespace FileMirroringTool.Models
 
         public List<FileInfo> GetBackupList(bool isAscending = true, bool skipExclamation = false)
         {
-            if (!BackUpDirInfo.Exists)
-                return new List<FileInfo>();
-            var pattern = OrigFile == null ? "*" : $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*";
-            var backups = BackUpDirInfo.GetAllFileInfos(pattern, SearchOption.TopDirectoryOnly, skipExclamation);
-            if (OrigFile != null)
+            if (!BackUpDirInfo.Exists) return new List<FileInfo>();
+            var pattern = OrigFile == null ? "*" : $"{Path.GetFileNameWithoutExtension(OrigFile.Name)}_*.*";
+            var backups = BackUpDirInfo.GetAllFileInfos(pattern, SearchOption.TopDirectoryOnly, skipExclamation).ToList();
+            if (!backups.Any()) return new List<FileInfo>();
+            if (OrigFile != null && OrigFile.Name.Contains("_"))
             {
-                //元々ファイル名にアンダーバーがあると余計なものも取得してきてしまうので除外する。
-                var reg = new Regex(Path.GetFileNameWithoutExtension(OrigFile.Name) + @"_\d{4,12}\..+");
-                backups = backups.Where(x => reg.IsMatch(x.Name));
+                //patternは正規表現が使えず、元々ファイル名にアンダーバーがあると余計なものも取得してきてしまうので除外する。
+                var regStr = Regex.Escape(Path.GetFileNameWithoutExtension(OrigFile.Name)) + @"_\d{4,12}\..+";
+                var reg = new Regex(regStr);
+                backups = backups.Where(x => reg.IsMatch(x.Name)).ToList();
             }
             return
                 isAscending ?
