@@ -159,6 +159,9 @@ namespace FileMirroringTool.Utils
                             destinationStream.Write(buffer, 0, bytesRead);
                         }
                     }
+                    //最終更新日時を比較しているのでコピー先のファイルを修正する。※CopyToと同じ挙動にする。
+                    if (destFileInfo.LastWriteTime != sourceFileInfo.LastWriteTime)
+                        destFileInfo.LastWriteTime = sourceFileInfo.LastWriteTime;
                 }
 
                 Console.WriteLine("ファイルのコピーが成功しました。");
