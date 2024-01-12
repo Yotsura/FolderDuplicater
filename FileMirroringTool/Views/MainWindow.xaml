@@ -7,7 +7,7 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:converter="clr-namespace:FileMirroringTool.Views.ValueConverter"
         mc:Ignorable="d" MouseDown="Window_MouseDown"
-        Title="MirroringTool" Height="650" Width="900" MinHeight="900" MinWidth="900"
+        Title="MirroringTool" Height="650" Width="900" MinHeight="600" MinWidth="900"
         Closing="SaveWindowStateInfo">
     <Window.Resources>
         <CollectionViewSource x:Name="CoDataSource" x:Key="NowDataView"  Source="{Binding MirrorList}" >
@@ -28,210 +28,223 @@
     <Grid>
         <Grid Margin="10,10,10,10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="70"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="200"/>
+                <RowDefinition MinHeight="300"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="250" MinHeight="250"/>
             </Grid.RowDefinitions>
-            <Menu Grid.Row="0">
-                <MenuItem Header="ファイル(_C)">
-                    <MenuItem Header="設定の保存" Command="{Binding SettingCtrlCommand}" CommandParameter="save"/>
-                    <MenuItem Header="ミラーリングの実行"
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Menu Grid.Row="0">
+                    <MenuItem Header="ファイル(_C)">
+                        <MenuItem Header="設定の保存" Command="{Binding SettingCtrlCommand}" CommandParameter="save"/>
+                        <MenuItem Header="ミラーリングの実行"
                         Command="{Binding MirroringCommand}"
                         CommandParameter="manual"/>
-                </MenuItem>
-                <MenuItem Header="ツール(_T)">
-                    <MenuItem Header="Sourceフォルダ内画像の拡張子修正を実行"
+                    </MenuItem>
+                    <MenuItem Header="ツール(_T)">
+                        <MenuItem Header="Sourceフォルダ内画像の拡張子修正を実行"
                         Command="{Binding FixExtensionCommand}"/>
-                </MenuItem>
-                <MenuItem Header="ヘルプ(_H)">
-                    <MenuItem Header="バージョン情報"/>
-                </MenuItem>
-            </Menu>
-            <Grid Margin="0,5,0,0" Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Sort："></Label>
-                <TextBox Margin="5,0,5,0" Grid.Column="1"
+                    </MenuItem>
+                    <MenuItem Header="ヘルプ(_H)">
+                        <MenuItem Header="バージョン情報"/>
+                    </MenuItem>
+                </Menu>
+                <Grid Margin="0,5,0,0" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Sort："></Label>
+                    <TextBox Margin="5,0,5,0" Grid.Column="1"
                      InputMethod.IsInputMethodEnabled="False"
                      PreviewTextInput="TextBox_PreviewTextInput"
                      CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
                      ToolTipService.ShowDuration="10000000"
                      ToolTip="処理順を設定します。数値が大きいほど先に処理されます。"
                      Text="{Binding Sort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <CheckBox Margin="5,0,0,0" Grid.Column="2"
+                    <CheckBox Margin="5,0,0,0" Grid.Column="2"
                         Content="EnableBackup"
                         ToolTip="差分バックアップを作成します。&#xa;1h以内：15mごと&#xa;48h以内：1hごと&#xa;7day以内：1dayごと"
                         IsChecked="{Binding NeedBackup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
-                <CheckBox Margin="5,0,0,0" Grid.Column="3"
+                    <CheckBox Margin="5,0,0,0" Grid.Column="3"
                         Content="Skip[!*]s"
                         ToolTip="!で始まるフォルダ・ファイルを処理の対象外にします。"
                         IsChecked="{Binding SkipExclamation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
-            </Grid>
-            <Grid Margin="0,5,0,0" Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="70"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Source："></Label>
-                <TextBox Margin="5,0,0,0" Grid.Column="1"
+                </Grid>
+                <Grid Margin="0,5,0,0" Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="70"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Source："></Label>
+                    <TextBox Margin="5,0,0,0" Grid.Column="1"
                      Text="{Binding OrigPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26" 
+                    <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26" 
                         Command="{Binding OpenDialogCommand}" CommandParameter="orig" ></Button>
-            </Grid>
-            <Grid Margin="0,5,0,0" Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="70"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Destination："></Label>
-                <TextBox Margin="5,0,0,0" Grid.Column="1"
+                </Grid>
+                <Grid Margin="0,5,0,0" Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="70"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Destination："></Label>
+                    <TextBox Margin="5,0,0,0" Grid.Column="1"
                      Text="{Binding DestPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      VerticalScrollBarVisibility="Auto" TextWrapping="NoWrap" AcceptsReturn="True" ></TextBox>
-                <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26" 
+                    <Button Grid.Column="2" Content="参照" Margin="5,0,0,0" Height="26" 
                         Command="{Binding OpenDialogCommand}" CommandParameter="dest" VerticalAlignment="Bottom" ></Button>
-            </Grid>
-            <Grid Margin="0,5,0,0" Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="70"/>
-                    <ColumnDefinition Width="70"/>
-                    <ColumnDefinition Width="70"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="設定："></Label>
-                <Button Grid.Column="1" Content="追加"
+                </Grid>
+                <Grid Margin="0,5,0,0" Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="70"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="設定："></Label>
+                    <Button Grid.Column="1" Content="追加"
                         Command="{Binding MirrorListCtrlCommand}" CommandParameter="add" ></Button>
-                <Button Grid.Column="2" Margin="3,0,0,0"  Content="更新"
+                    <Button Grid.Column="2" Margin="3,0,0,0"  Content="更新"
                         Command="{Binding MirrorListCtrlCommand}" CommandParameter="upd" ></Button>
-                <Button Grid.Column="3" Margin="3,0,0,0"  Content="削除"
+                    <Button Grid.Column="3" Margin="3,0,0,0"  Content="削除"
                         Command="{Binding MirrorListCtrlCommand}" CommandParameter="del" ></Button>
-                <Button Grid.Column="4" Margin="10,0,0,0" Content="保存"
+                    <Button Grid.Column="4" Margin="10,0,0,0" Content="保存"
                         Command="{Binding SettingCtrlCommand}" CommandParameter="save"></Button>
-                <Button Grid.Column="5" Margin="3,0,0,0" Content="再読込"
+                    <Button Grid.Column="5" Margin="3,0,0,0" Content="再読込"
                         Command="{Binding SettingCtrlCommand}" CommandParameter="reload"></Button>
-            </Grid>
-            <DataGrid Margin="0,5,0,0" Grid.Row="5"
-                AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
-                SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
-                ItemsSource="{Binding Source={StaticResource NowDataView}}"
-                Name="MainDataGrid">
-                <DataGrid.CellStyle>
-                    <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                        <Setter Property="BorderThickness" Value="0" />
-                    </Style>
-                </DataGrid.CellStyle>
-                <DataGrid.InputBindings>
-                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding SingleMirroringCommand}"/>
-                </DataGrid.InputBindings>
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="60" CanUserResize="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                </Grid>
+                <DataGrid Margin="0,5,0,0" Grid.Row="5"
+                    AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
+                    SelectedItem="{Binding SelectedMirrorInfo, Mode=TwoWay}"
+                    ItemsSource="{Binding Source={StaticResource NowDataView}}"
+                    Name="MainDataGrid">
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                            <Setter Property="BorderThickness" Value="0" />
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.InputBindings>
+                        <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding SingleMirroringCommand}"/>
+                    </DataGrid.InputBindings>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn IsReadOnly="True" Header="選択" Width="60" CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     Checked="CheckBox_CheckChangeed" Unchecked="CheckBox_CheckChangeed"
                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Sort" Width="60" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
-                    <DataGridTextColumn Header="Backup" Width="80" CanUserResize="False"
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="ID" Width="50" CanUserResize="False" Binding="{Binding ID,Mode=OneWay}"/>
+                        <DataGridTextColumn Header="Sort" Width="60" CanUserResize="False" Binding="{Binding Sort,Mode=OneWay}"/>
+                        <DataGridTextColumn Header="Backup" Width="80" CanUserResize="False"
                                         Binding="{Binding NeedBackup,Mode=OneWay,Converter={StaticResource BoolToOnOffConverter}}"/>
-                    <DataGridTextColumn Header="Skip[!*]s" Width="85" CanUserResize="False"
+                        <DataGridTextColumn Header="Skip[!*]s" Width="85" CanUserResize="False"
                                         Binding="{Binding SkipExclamation,Mode=OneWay,Converter={StaticResource BoolToOnOffConverter}}"/>
-                    <DataGridTextColumn Header="Mirror Source" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="ToolTip" Value="{Binding OrigPath}" />
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Mirror Destination" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="ToolTip" Value="{Binding DestPathsStr}" />
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-            <Grid Margin="0,5,0,0" Grid.Row="6">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="105"/>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="1" Content="AutomationInverval："></Label>
-                <TextBox Grid.Column="2"
+                        <DataGridTextColumn Header="Mirror Source" MinWidth="100" Width="*" Binding="{Binding OrigPath,Mode=OneWay}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="ToolTip" Value="{Binding OrigPath}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Mirror Destination" MinWidth="100" Width="*" Binding="{Binding DestPathsStr,Mode=OneWay}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="ToolTip" Value="{Binding DestPathsStr}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+            <GridSplitter Grid.Row ="1" HorizontalAlignment="Stretch"/>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid Margin="0,5,0,0" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="105"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="1" Content="AutomationInverval："></Label>
+                    <TextBox Grid.Column="2"
                      InputMethod.IsInputMethodEnabled="False"
                      PreviewTextInput="TextBox_PreviewTextInput3"
                      CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
                      ToolTipService.ShowDuration="10000000"
                      ToolTip="自動実行するインターバルを設定します。"
                      Text="{Binding AutoIntervalStr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <Label Grid.Column="3" Content="hours"></Label>
-                
-                <Button Grid.Column="4" Content="自動実行"
+                    <Label Grid.Column="3" Content="hours"></Label>
+
+                    <Button Grid.Column="4" Content="自動実行"
                         Command="{Binding MirroringCommand}"
                         CommandParameter="auto"></Button>
-                <Button Grid.Column="5" Margin="5,0,0,0" Content="手動実行"
+                    <Button Grid.Column="5" Margin="5,0,0,0" Content="手動実行"
                         Command="{Binding MirroringCommand}"
                         CommandParameter="manual"></Button>
-            </Grid>
-            <Grid Margin="0,15,0,0" Grid.Row="7">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="70"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Column="0" Content="SearchBackupFile："></Label>
-                    <TextBox Margin="5,0,0,0" Grid.Column="1"
-                            Text="{Binding SearchFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                    <Button Margin="5,0,0,0" Grid.Column="2" Content="参照" Height="26" 
-                            Command="{Binding OpenDialogCommand}" CommandParameter="backup" VerticalAlignment="Bottom" ></Button>
                 </Grid>
-                <DataGrid Margin="0,5,0,0" Grid.Row="1" Name="SubDataGrid"
+                <Grid Margin="0,15,0,0" Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0" Content="SearchBackupFile："></Label>
+                        <TextBox Margin="5,0,0,0" Grid.Column="1"
+                            Text="{Binding SearchFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                        <Button Margin="5,0,0,0" Grid.Column="2" Content="参照" Height="26" 
+                            Command="{Binding OpenDialogCommand}" CommandParameter="backup" VerticalAlignment="Bottom" ></Button>
+                    </Grid>
+                    <DataGrid Margin="0,5,0,0" Grid.Row="1" Name="SubDataGrid"
                         AutoGenerateColumns="False" IsReadOnly="True" SelectedIndex="-1" SelectionMode="Single"
                         SelectedItem="{Binding SelectedBackupFile, Mode=TwoWay}"
                         ItemsSource="{Binding Source={StaticResource NowDataView2}}">
-                    <DataGrid.InputBindings>
-                        <MouseBinding MouseAction="LeftDoubleClick"
+                        <DataGrid.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick"
                                   Command="{Binding OpenExplorerCommand}"
                                   CommandParameter="{Binding SelectedBackupFile,Converter={StaticResource FileInfoConverter}}"/>
-                    </DataGrid.InputBindings>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="LastWriteTime" Width="150" CanUserResize="False"
+                        </DataGrid.InputBindings>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="LastWriteTime" Width="150" CanUserResize="False"
                                                 Binding="{Binding LastWriteTime,Mode=OneWay ,Converter={StaticResource DateConverter}}"/>
-                        <DataGridTextColumn Header="Path" Width="*" CanUserResize="False"
+                            <DataGridTextColumn Header="Path" Width="*" CanUserResize="False"
                                                 Binding="{Binding FullName,Mode=OneWay ,Converter={StaticResource FileNameConverter}}"/>
-                        <DataGridTextColumn Header="Size(Byte)" Width="100" CanUserResize="False"
+                            <DataGridTextColumn Header="Size(Byte)" Width="100" CanUserResize="False"
                                                 Binding="{Binding Length,Mode=OneWay}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
             </Grid>
         </Grid>
     </Grid>
