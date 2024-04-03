@@ -215,6 +215,7 @@
     <Compile Include="Models\BackupManager.cs" />
     <Compile Include="Models\FileCount.cs" />
     <Compile Include="Models\WindowStateInfo.cs" />
+    <Compile Include="Utils\EncryptUtils.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="ViewModels\Commands\FixExtensionsCtrl.cs" />
     <Compile Include="ViewModels\Commands\SingleMirroringCtrl .cs" />
@@ -239,6 +240,7 @@
     <Compile Include="Views\ValueConverter\DateConverter.cs" />
     <Compile Include="Views\ValueConverter\FileInfoConverter.cs" />
     <Compile Include="Views\ValueConverter\FileNameConverter.cs" />
+    <Compile Include="Views\ValueConverter\IntToModeNameConverter.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -58,7 +58,7 @@ namespace FileMirroringTool.Utils
                     System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file.FullName}");
                     return true; //ファイルが壊れている可能性？
                 }
-            }).ToList();
+            }).ToArray();
             return skipExclamation ?
                 files.Where(file => !file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!"))
                 : files;

@@ -16,6 +16,7 @@ namespace FileMirroringTool.Models
         public bool SkipExclamation { get; set; } = false;
         public bool NeedBackup { get; set; } = false;
         public BackupManager BackupInfo => new BackupManager(OrigPath);
+        public int EncryptMode { get; set; } = 0;
 
         public bool IsChecked { get; set; } = true;
         public string OrigPath { get; set; } = string.Empty;
@@ -38,6 +39,7 @@ namespace FileMirroringTool.Models
             var result = ID == record.ID &&
                 Sort == record.Sort &&
                 SkipExclamation == record.SkipExclamation &&
+                EncryptMode == record.EncryptMode &&
                 NeedBackup == record.NeedBackup &&
                 OrigPath == record.OrigPath &&
                 DestPathsStr == record.DestPathsStr;
@@ -49,9 +51,9 @@ namespace FileMirroringTool.Models
             var hashCode = ID ^ Sort
                 ^ SkipExclamation.GetHashCode()
                 ^ NeedBackup.GetHashCode()
+                ^ EncryptMode
                 ^ OrigPath.GetHashCode()
                 ^ DestPathsStr.GetHashCode();
-
             return hashCode;
         }
 
@@ -67,25 +69,32 @@ namespace FileMirroringTool.Models
             try
             {
                 token.ThrowIfCancellationRequested();
-                //mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
+                mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
+
+                var sw = new System.Diagnostics.Stopwatch();
+                sw.Start();
                 var fileList = new DirectoryInfo(OrigPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation).ToArray();
+                
+                var time_updlistup = sw.Elapsed;
+                sw.Restart();
 
                 foreach (var destPath_orig in ExistDestPathsList)
                 {
-                    mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath_orig}";
-                    var updList1 = fileList.Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).Where(x => x.IsNewFile || x.IsUpdatedFile);
+                    var updList = fileList.Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).ToArray();
+                    var updList1 = fileList.Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).Where(x => x.IsNewFile || x.IsUpdatedFile).ToArray();
                     mwvm.FileCnt_Target = updList1.Count();
                     mwvm.FileCnt_Checked = 0;
+                    mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath_orig}";
                     updList1.AsParallel().ForAll(data =>
                     {
                         token.ThrowIfCancellationRequested();
                         try
                         {
                             mwvm.PrgFileName = data.DestInfo.FullName;
-                            if (data.TryDupricateFile())
+                            if (data.TryDupricateFile(EncryptMode))
                                 if (data.IsUpdatedFile)
-                                    FileCounter.UpdCnt++;
-                                else if (data.IsNewFile) FileCounter.AddCnt++;
+                                    FileCounter.AddUpdCnt();
+                                else if (data.IsNewFile) FileCounter.AddAddCnt();
                         }
                         catch (Exception e)
                         {
@@ -94,8 +103,12 @@ namespace FileMirroringTool.Models
                         mwvm.FileCnt_Checked++;
                     });
                 }
+                sw.Stop();
 
-                //mwvm.PrgTitle = $"＜削除対象リストアップ中＞";
+                var time_upd = sw.Elapsed;
+                sw.Restart();
+
+                mwvm.PrgTitle = $"＜削除対象リストアップ中＞";
                 mwvm.ResetPrgStat();
                 var delList = ExistDestPathsList
                     .Select(destPath =>
@@ -106,6 +119,10 @@ namespace FileMirroringTool.Models
                             .Select(file => new FileData(OrigPath, destPath, file.FullName, false))
                             .Where(file => file.IsDeletedFile).ToArray()
                     ));
+
+                var time_dellistup = sw.Elapsed;
+                sw.Restart();
+
                 mwvm.FileCnt_Target = delList.Sum(x => x.files.Count());
                 foreach (var (dir, files) in delList)
                 {
@@ -116,7 +133,7 @@ namespace FileMirroringTool.Models
                         mwvm.FileCnt_Checked++;
                         mwvm.PrgFileName = file.DestInfo.FullName;
                         if (file.TryDeleteDestFile())
-                            FileCounter.DelCnt++;
+                            FileCounter.AddDelCnt();
                     });
                 }
                 mwvm.PrgTitle = $"＜空ディレクトリ削除中＞";
@@ -124,6 +141,13 @@ namespace FileMirroringTool.Models
                 ExistDestPathsList.ForEach(x => FileUtils.DeleteEmptyDirs(x));
                 //ExistDestPathsList.SelectMany(dir => Directory.EnumerateDirectories(dir, "*", SearchOption.AllDirectories))
                 //    .OrderBy(x => x.Length).ToList().ForEach(dir => FileUtils.DeleteEmptyDirs(dir));
+
+                var time_del = sw.Elapsed;
+                Console.WriteLine($"処理にかかった時間\r\n" +
+                    $"updリストアップ：{time_updlistup}" +
+                    $"upd実行：{time_upd}" +
+                    $"delリストアップ：{time_dellistup}" +
+                    $"del実行：{time_del}");
             }
             catch (Exception e)
             {

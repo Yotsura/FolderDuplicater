@@ -47,6 +47,8 @@ namespace FileMirroringTool.ViewModels.Commands
                 Sort = int.TryParse(_mwvm.Sort, out var snum) ? snum : 0,
                 NeedBackup = _mwvm.NeedBackup,
                 SkipExclamation = _mwvm.SkipExclamation,
+                EncryptMode = _mwvm.EncryptMode,
+
                 OrigPath = _mwvm.OrigPath,
                 DestPathsStr = _mwvm.DestPath,
             };
@@ -57,6 +59,7 @@ namespace FileMirroringTool.ViewModels.Commands
                     inputdata.ID = nextID;
                     _mwvm.MirrorList.Add(inputdata);
                     _mwvm.Sort = string.Empty;
+                    _mwvm.EncryptMode = 0;
                     _mwvm.OrigPath = string.Empty;
                     _mwvm.DestPath = string.Empty;
                     break;

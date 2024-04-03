@@ -2,23 +2,25 @@
 using System.IO;
 using System.Linq;
 using FileMirroringTool.Extensions;
+using FileMirroringTool.Utils;
 
 namespace FileMirroringTool.Models
 {
     internal class FileData
     {
-        public bool IsNewFile => OrigInfo.Exists && !DestInfo.Exists;
-        public bool IsUpdatedFile => DestInfo.Exists && OrigInfo.Exists
-            && DestInfo.LastWriteTime < OrigInfo.LastWriteTime;
-        public bool IsDeletedFile => !OrigInfo.Exists && DestInfo.Exists;
+        public readonly bool IsNewFile;
+        public readonly bool IsUpdatedFile;
+        public readonly bool IsDeletedFile;
+
+        internal EncryptUtils EncryptUtils = new EncryptUtils(Settings.Default.EncryptKey);
         /// <summary>
         /// ミラー元ファイル
         /// </summary>
-        public FileInfo OrigInfo { get; set; }
+        public readonly FileInfo OrigInfo;
         /// <summary>
         /// ミラー先ファイル
         /// </summary>
-        public FileInfo DestInfo { get; set; }
+        public readonly FileInfo DestInfo;
 
         public FileData(string origPath, string destPath, string filepath, bool isOrig)
         {
@@ -32,16 +34,31 @@ namespace FileMirroringTool.Models
                 DestInfo = new FileInfo(filepath);
                 OrigInfo = new FileInfo(filepath.GetRelativePath(destPath, origPath));
             }
+            IsNewFile = OrigInfo.Exists && !DestInfo.Exists;
+            IsUpdatedFile = DestInfo.Exists && OrigInfo.Exists
+                && DestInfo.LastWriteTime < OrigInfo.LastWriteTime;
+            IsDeletedFile = !OrigInfo.Exists && DestInfo.Exists;
         }
 
-        public bool TryDupricateFile()
+        public bool TryDupricateFile(int encryptMode)
         {
             var result = false;
             if (!Directory.Exists(DestInfo.DirectoryName))
                 Directory.CreateDirectory(DestInfo.DirectoryName);
             try
             {
-                File.Copy(OrigInfo.FullName, DestInfo.FullName, true);
+                switch(encryptMode)
+                {
+                    case 1:
+                        EncryptUtils.EncryptFile(OrigInfo, DestInfo);
+                        break;
+                    case 2:
+                        EncryptUtils.DecryptFile(OrigInfo, DestInfo);
+                        break;
+                    default:
+                        File.Copy(OrigInfo.FullName, DestInfo.FullName, true);
+                        break;
+                }
                 result = true;
             }
             catch (Exception e)
