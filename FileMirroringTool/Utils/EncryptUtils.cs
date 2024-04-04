@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 
 namespace FileMirroringTool.Utils
@@ -42,16 +44,14 @@ namespace FileMirroringTool.Utils
             return deriveBytes.GetBytes(BLOCK_SIZE / 8);
         }
 
-
-        public static bool EncryptFile(string srcFilePath, string destFilePath, string password)
+        public static void EncryptFile(string srcFilePath, string destFilePath, string password)
         {
             byte[] salt = GetSalt();
             byte[] iv = GetIVFromPassword(password);
             byte[] key = GetKeyFromPassword(password, salt);
-
             try
             {
-                using (var dst_fs = new FileStream(destFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                using (var dst_fs = new FileStream(destFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     dst_fs.Write(salt, 0, salt.Length);
                     dst_fs.Write(iv, 0, iv.Length);
@@ -64,10 +64,7 @@ namespace FileMirroringTool.Utils
                         byte[] buffer = new byte[BUFFER_SIZE];
                         int len = 0;
                         while ((len = src_fs.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            // 出力ファイルへ書き込み（圧縮→暗号化→書き込み）
-                            ds.Write(buffer, 0, len);
-                        }
+                            ds.Write(buffer, 0, len);   //圧縮→暗号化→書き込み
                     }
                 }
                 //比較に使用している最終更新日時をあわせる。
@@ -75,23 +72,21 @@ namespace FileMirroringTool.Utils
             }
             catch
             {
-                return false;
+                throw new NotImplementedException();
             }
-            return true;
         }
 
-        public static bool DecryptFile(string srcFilePath, string destFilePath, string password)
+        public static void DecryptFile(string srcFilePath, string destFilePath, string password)
         {
             try
             {
+                var decryptedData = new List<byte>();
                 using (var src_fs = new FileStream(srcFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    byte[] salt = src_fs.GetBytes(SALT_SIZE);
+                    byte[] salt = src_fs.ReadBytes(SALT_SIZE);
                     byte[] key = GetKeyFromPassword(password, salt);
-                    byte[] iv = src_fs.GetBytes(BLOCK_SIZE / 8);
+                    byte[] iv = src_fs.ReadBytes(BLOCK_SIZE / 8);
 
-                    // 復号化オブジェクト生成
-                    using (var dst_fs = new FileStream(destFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                     using (AesManaged aes = GetAesManaged())
                     using (var cs = new CryptoStream(src_fs, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read))
                     using (var ds = new DeflateStream(cs, CompressionMode.Decompress))
@@ -99,22 +94,22 @@ namespace FileMirroringTool.Utils
                         byte[] buffer = new byte[BUFFER_SIZE];
                         int len = 0;
                         while ((len = ds.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            dst_fs.Write(buffer, 0, len);
-                        }
+                            decryptedData.AddRange(buffer.Take(len));
                     }
                 }
+                using (var dst_fs = new FileStream(destFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                    dst_fs.Write(decryptedData.ToArray(), 0, decryptedData.Count);
+
                 //比較に使用している最終更新日時をあわせる。
                 File.SetLastWriteTime(destFilePath, File.GetLastWriteTime(srcFilePath));
             }
             catch
             {
-                return false;
+                throw new NotImplementedException();
             }
-            return true;
         }
 
-        static byte[] GetBytes(this FileStream fs, int datalength)
+        static byte[] ReadBytes(this FileStream fs, int datalength)
         {
             var data = new byte[datalength];
             fs.Read(data, 0, datalength);
