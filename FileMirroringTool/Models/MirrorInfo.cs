@@ -80,30 +80,26 @@ namespace FileMirroringTool.Models
 
                 foreach (var destPath_orig in ExistDestPathsList)
                 {
-                    var updList = fileList.Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).ToArray();
-                    var updList1 = fileList.Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).Where(x => x.IsNewFile || x.IsUpdatedFile).ToArray();
-                    mwvm.FileCnt_Target = updList1.Length;
+                    var updList = fileList.AsParallel().Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).Where(x => x.IsNewFile || x.IsUpdatedFile).ToArray();
+                    mwvm.FileCnt_Target = updList.Length;
                     mwvm.FileCnt_Checked = 0;
                     mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath_orig}";
-                    updList1.AsParallel().ForAll(data =>
+                    updList.AsParallel().ForAll(data =>
                     {
                         token.ThrowIfCancellationRequested();
                         try
                         {
                             mwvm.PrgFileName = data.DestInfo.FullName;
-                            if (data.IsUpdatedFile || data.IsNewFile)
+                            if (data.TryDupricateFile(EncryptMode))
                             {
-                                if (data.TryDupricateFile(EncryptMode))
-                                {
-                                    if (data.IsUpdatedFile)
-                                        FileCounter.AddUpdCnt();
+                                if (data.IsUpdatedFile)
+                                    FileCounter.AddUpdCnt();
 
-                                    else if (data.IsNewFile)
-                                        FileCounter.AddAddCnt();
-                                }
-                                else
-                                    FileCounter.AddFailCnt();
+                                else if (data.IsNewFile)
+                                    FileCounter.AddAddCnt();
                             }
+                            else
+                                FileCounter.AddFailCnt();
                         }
                         catch (Exception e)
                         {
@@ -125,6 +121,7 @@ namespace FileMirroringTool.Models
                         dir: destPath,
                         files:
                             new DirectoryInfo(destPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation)
+                            .AsParallel()
                             .Select(file => new FileData(OrigPath, destPath, file.FullName, false))
                             .Where(file => file.IsDeletedFile).ToArray()
                     ));
