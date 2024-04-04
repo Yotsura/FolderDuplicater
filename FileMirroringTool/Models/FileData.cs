@@ -12,7 +12,6 @@ namespace FileMirroringTool.Models
         public readonly bool IsUpdatedFile;
         public readonly bool IsDeletedFile;
 
-        internal EncryptUtils EncryptUtils = new EncryptUtils(Settings.Default.EncryptKey);
         /// <summary>
         /// ミラー元ファイル
         /// </summary>
@@ -50,10 +49,10 @@ namespace FileMirroringTool.Models
                 switch(encryptMode)
                 {
                     case 1:
-                        EncryptUtils.EncryptFile(OrigInfo, DestInfo);
+                        EncryptUtils.EncryptFile(OrigInfo.FullName, DestInfo.FullName, Settings.Default.EncryptKey);
                         break;
                     case 2:
-                        EncryptUtils.DecryptFile(OrigInfo, DestInfo);
+                        EncryptUtils.DecryptFile(OrigInfo.FullName, DestInfo.FullName, Settings.Default.EncryptKey);
                         break;
                     default:
                         File.Copy(OrigInfo.FullName, DestInfo.FullName, true);

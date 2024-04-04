@@ -37,7 +37,7 @@ namespace FileMirroringTool {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("pass")]
+        [global::System.Configuration.DefaultSettingValueAttribute("p239)\'$%dDSw")]
         public string EncryptKey {
             get {
                 return ((string)(this["EncryptKey"]));

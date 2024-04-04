@@ -1,80 +1,124 @@
-﻿using System.Text;
-using System.Security.Cryptography;
+﻿using System;
 using System.IO;
-using System.Diagnostics;
-using System;
-using System.Linq;
+using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace FileMirroringTool.Utils
 {
-    internal class EncryptUtils
+    internal static class EncryptUtils
     {
-        internal EncryptUtils(string pass)
-        {
-            var key = Encoding.UTF8.GetBytes("12345678901234567890123456789012");
-            var passByte = Encoding.UTF8.GetBytes(pass);
-            for (var i = 0; i < 32  ; i++)
-            {
-                if (passByte.Length <= i) break;
-                key[i] = passByte[i];
-            }
-            _encryptKey = key;
-        }
+        const int KEY_SIZE = 256;
+        const int BLOCK_SIZE = 128;
+        const int BUFFER_SIZE = BLOCK_SIZE * 64;  // バッファーサイズはBlockSizeの倍数にする
+        const int SALT_SIZE = 25; // 8以上
 
-        readonly byte[] _encryptKey = new byte[32];
-        readonly byte[] _dummy = new byte[16];
-        readonly byte[] _buffer = new byte[8192];
-
-        private AesManaged GetAesManaged() => new AesManaged
+        private static AesManaged GetAesManaged() => new AesManaged
         {
-            KeySize = 256,
-            BlockSize = 128,
+            KeySize = KEY_SIZE,
+            BlockSize = BLOCK_SIZE,
             Mode = CipherMode.CBC,
-            IV = _dummy,
-            Key = _encryptKey,
-            Padding = PaddingMode.PKCS7
+            Padding = PaddingMode.ISO10126
         };
 
-        internal void EncryptFile(FileInfo sourceFile, FileInfo saveFile)
+        private static byte[] GetSalt()
+            => new Rfc2898DeriveBytes(DateTime.Now.Ticks.ToString(), SALT_SIZE).Salt;
+
+        //パスワードから暗号キーを作成する
+        private static byte[] GetKeyFromPassword(string password, byte[] salt)
         {
-            using (ICryptoTransform encryptor = GetAesManaged().CreateEncryptor())
-            using (var src_fs = new FileStream(sourceFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var dst_fs = new FileStream(saveFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
-            // 一定サイズずつ暗号化して出力ファイルストリームに書き出す
-            using (var cs = new CryptoStream(dst_fs, encryptor, CryptoStreamMode.Write))
-            {
-                // 先頭16バイトをdummyで埋める
-                cs.Write(_dummy, 0, _dummy.Length);
-
-                int len = 0;
-                while ((len = src_fs.Read(_buffer, 0, _buffer.Length)) > 0)
-                {
-                    cs.Write(_buffer, 0, len);
-                }
-            }
-
-            //比較に使用している最終更新日時をあわせる。
-            saveFile.LastWriteTime = sourceFile.LastWriteTime;
+            //Rfc2898DeriveBytesオブジェクトを作成する
+            var deriveBytes = new Rfc2898DeriveBytes(password, salt);
+            //反復処理回数を指定する デフォルトで1000回
+            deriveBytes.IterationCount = 1000;
+            //キーを生成する
+            return deriveBytes.GetBytes(KEY_SIZE / 8);
         }
 
-        internal void DecryptFile(FileInfo encriptedFile, FileInfo saveFile)
+        //パスワードから初期化ベクトルを作成する
+        private static byte[] GetIVFromPassword(string password)
         {
-            using (var decryptor = GetAesManaged().CreateDecryptor())
-            using (var src_fs = new FileStream(encriptedFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var dst_fs = new FileStream(saveFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
-            using (var cs = new CryptoStream(src_fs, decryptor, CryptoStreamMode.Read))
-            {
-                // 先頭16バイトは不要なのでまず復号して破棄
-                cs.Read(_dummy, 0, _dummy.Length);
+            var deriveBytes = new Rfc2898DeriveBytes(password + DateTime.Now.Ticks.ToString(), 100);
+            deriveBytes.IterationCount = 1000;
+            return deriveBytes.GetBytes(BLOCK_SIZE / 8);
+        }
 
-                int len = 0;
-                while ((len = cs.Read(_buffer, 0, _buffer.Length)) > 0)
+
+        public static bool EncryptFile(string srcFilePath, string destFilePath, string password)
+        {
+            byte[] salt = GetSalt();
+            byte[] iv = GetIVFromPassword(password);
+            byte[] key = GetKeyFromPassword(password, salt);
+
+            try
+            {
+                using (var dst_fs = new FileStream(destFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
                 {
-                    dst_fs.Write(_buffer, 0, len);
+                    dst_fs.Write(salt, 0, salt.Length);
+                    dst_fs.Write(iv, 0, iv.Length);
+
+                    using (var src_fs = new FileStream(srcFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (AesManaged aes = GetAesManaged())
+                    using (var cs = new CryptoStream(dst_fs, aes.CreateEncryptor(key, iv), CryptoStreamMode.Write))
+                    using (var ds = new DeflateStream(cs, CompressionMode.Compress))
+                    {
+                        byte[] buffer = new byte[BUFFER_SIZE];
+                        int len = 0;
+                        while ((len = src_fs.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            // 出力ファイルへ書き込み（圧縮→暗号化→書き込み）
+                            ds.Write(buffer, 0, len);
+                        }
+                    }
                 }
+                //比較に使用している最終更新日時をあわせる。
+                File.SetLastWriteTime(destFilePath, File.GetLastWriteTime(srcFilePath));
             }
-            //比較に使用している最終更新日時をあわせる。
-            saveFile.LastWriteTime = encriptedFile.LastWriteTime;
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public static bool DecryptFile(string srcFilePath, string destFilePath, string password)
+        {
+            try
+            {
+                using (var src_fs = new FileStream(srcFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    byte[] salt = src_fs.GetBytes(SALT_SIZE);
+                    byte[] key = GetKeyFromPassword(password, salt);
+                    byte[] iv = src_fs.GetBytes(BLOCK_SIZE / 8);
+
+                    // 復号化オブジェクト生成
+                    using (var dst_fs = new FileStream(destFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                    using (AesManaged aes = GetAesManaged())
+                    using (var cs = new CryptoStream(src_fs, aes.CreateDecryptor(key, iv), CryptoStreamMode.Read))
+                    using (var ds = new DeflateStream(cs, CompressionMode.Decompress))
+                    {
+                        byte[] buffer = new byte[BUFFER_SIZE];
+                        int len = 0;
+                        while ((len = ds.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            dst_fs.Write(buffer, 0, len);
+                        }
+                    }
+                }
+                //比較に使用している最終更新日時をあわせる。
+                File.SetLastWriteTime(destFilePath, File.GetLastWriteTime(srcFilePath));
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        static byte[] GetBytes(this FileStream fs, int datalength)
+        {
+            var data = new byte[datalength];
+            fs.Read(data, 0, datalength);
+            return data;
         }
     }
 }
