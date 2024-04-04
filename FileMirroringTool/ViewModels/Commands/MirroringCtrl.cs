@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using System.Windows.Input;
 namespace FileMirroringTool.ViewModels.Commands
 {
@@ -61,7 +62,12 @@ namespace FileMirroringTool.ViewModels.Commands
             var result =
                 string.Join("\r\n",
                 MirrorList.Select(mirror => $"【ID：{mirror.ID}（backup：{(mirror.NeedBackup ? "on" : "off")}）】{ mirror.FileCounter.CntInfoStr}"));
-            System.Windows.MessageBox.Show($"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}");
+            using (Form f = new Form())
+            {
+                f.TopMost = true;
+                MessageBox.Show(f, $"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}");
+                f.TopMost = false;
+            }
             cancelTokenSource.Dispose();
         }
 
@@ -96,8 +102,13 @@ namespace FileMirroringTool.ViewModels.Commands
 
             pd.Closed += (e, s) =>
             {
-                System.Windows.MessageBox.Show("自動ミラーリングが停止されました。"
-                    + $"\r\n最後の実行：{(runCnt > 0 ? lastRunTime.ToString("HH:mm:ss") : string.Empty)}");
+                using (Form f = new Form())
+                {
+                    f.TopMost = true;
+                    MessageBox.Show(f, "自動ミラーリングが停止されました。"
+                        + $"\r\n最後の実行：{(runCnt > 0 ? lastRunTime.ToString("HH:mm:ss") : string.Empty)}");
+                    f.TopMost = false;
+                }
                 cancelTokenSource.Dispose();
                 _mwvm.AutoRunning = false;
             };

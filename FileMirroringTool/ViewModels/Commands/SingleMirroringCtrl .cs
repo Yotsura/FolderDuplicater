@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using System.Windows.Input;
 namespace FileMirroringTool.ViewModels.Commands
 {
@@ -49,7 +50,12 @@ namespace FileMirroringTool.ViewModels.Commands
             sw.Stop();
 
             var result = $"【ID：{mirror.ID}（backup：{(mirror.NeedBackup ? "on" : "off")}）】{mirror.FileCounter.CntInfoStr}";
-            System.Windows.MessageBox.Show($"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}\r\n実行時間：{sw.Elapsed}");
+            using (Form f = new Form())
+            {
+                f.TopMost = true;
+                MessageBox.Show(f, $"ミラーリングが{(pd.IsCompleted ? "完了しました。" : "中止されました。")}\r\n{result}\r\n実行時間：{sw.Elapsed}");
+                f.TopMost = false;
+            }
             cancelTokenSource.Dispose();
         }
     }
