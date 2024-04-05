@@ -1,6 +1,9 @@
 ﻿using FileMirroringTool.Models;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FileMirroringTool.ViewModels.Commands
@@ -52,6 +55,28 @@ namespace FileMirroringTool.ViewModels.Commands
                 OrigPath = _mwvm.OrigPath,
                 DestPathsStr = _mwvm.DestPath,
             };
+            //add updの場合、各パスが存在するかチェック
+            if (parameter.ToString() == "add" || parameter.ToString() == "upd")
+            {
+                var errmsg = new List<string>();
+                var sourceDir = new DirectoryInfo(inputdata.OrigPath);
+                if (!sourceDir.Exists) errmsg.Add("Sourceのフォルダが見つかりません。");
+                var sourceTopDirs = sourceDir.EnumerateDirectories();
+                var sourceTopFiles = sourceDir.EnumerateFiles();
+                inputdata.ExistDestPathsList.ForEach(dest =>
+                {
+                    var destDir = new DirectoryInfo(dest);
+                    var destTopDirs = destDir.EnumerateDirectories();
+                    var destTopFiles = destDir.EnumerateFiles();
+                    if (!destTopDirs.Any() && !destTopFiles.Any()) return;
+                    //origとdestを比較し、一番上の階層でフォルダ名/ファイル名が全く一致しない場合、設定ミスの可能性があるので警告
+                    //sourceにないフォルダ/ファイルがdestにある場合、かつsourceにあるもの
+                });
+                if (errmsg.Any())
+                    MessageBox.Show(string.Join("\r\n", errmsg)+ "\r\n各パスをご確認ください。設定を追加/更新しますか？", "警告",
+                        MessageBoxButton.OKCancel, MessageBoxImage.Information);
+            }
+
             var targetItem = _mwvm.MirrorList.FirstOrDefault(x => x.ID == inputdata.ID);
             switch (parameter.ToString())
             {

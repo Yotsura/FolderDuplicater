@@ -240,6 +240,7 @@
     <Compile Include="Views\ValueConverter\DateConverter.cs" />
     <Compile Include="Views\ValueConverter\FileInfoConverter.cs" />
     <Compile Include="Views\ValueConverter\FileNameConverter.cs" />
+    <Compile Include="Views\ValueConverter\IntToBoolConverter.cs" />
     <Compile Include="Views\ValueConverter\IntToModeNameConverter.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

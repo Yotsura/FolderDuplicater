@@ -25,6 +25,7 @@
         <converter:FileNameConverter x:Key="FileNameConverter"/>
         <converter:BoolToOnOffConverter x:Key="BoolToOnOffConverter"/>
         <converter:IntToModeNameConverter x:Key="IntToModeNameConverter"/>
+        <converter:IntToBoolConverter x:Key="IntToBoolConverter"/>
     </Window.Resources>
     <Grid>
         <Grid Margin="10,10,10,10">
@@ -89,6 +90,7 @@
                     <CheckBox Margin="5,0,0,0" Grid.Column="4"
                         Content="EncryptMode"
                         ToolTip="暗号化機能"
+                        IsEnabled="{Binding SelectedMirrorInfo.ID,Converter={StaticResource IntToBoolConverter}, UpdateSourceTrigger=PropertyChanged}"
                         IsChecked="{Binding EnableEncryption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
                     <ComboBox  Margin="5,0,5,0" Grid.Column="5"
