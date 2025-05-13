@@ -49,6 +49,7 @@ namespace FileMirroringTool.Utils
             if (!targetDirectory.Exists) return Enumerable.Empty<FileInfo>();
             var files = targetDirectory.EnumerateFiles(pattern, searchOption).Where(file =>
             {
+                if (skipExclamation && file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!")) return false;
                 try
                 {
                     var attr = file.Attributes;
@@ -62,10 +63,8 @@ namespace FileMirroringTool.Utils
                     System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file.FullName}");
                     return true; //ファイルが壊れている可能性？
                 }
-            }).ToArray();
-            return skipExclamation ?
-                files.Where(file => !file.FullName.Substring(targetDirectory.FullName.Length).Contains(@"\!"))
-                : files;
+            });
+            return files;
         }
 
         /// <summary>

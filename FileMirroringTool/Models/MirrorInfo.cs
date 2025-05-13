@@ -71,46 +71,49 @@ namespace FileMirroringTool.Models
                 token.ThrowIfCancellationRequested();
                 mwvm.PrgTitle = $"＜更新対象リストアップ中＞{OrigPath}";
 
+                var resultTxts = new List<string>();
                 var sw = new System.Diagnostics.Stopwatch();
                 sw.Start();
-                var fileList = new DirectoryInfo(OrigPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation).ToArray();
-                
-                var time_updlistup = sw.Elapsed;
+                var fileList = new DirectoryInfo(OrigPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation);
+
+                resultTxts.Add($"全ファイルリストアップ：{sw.Elapsed}");
                 sw.Restart();
 
-                foreach (var destPath_orig in ExistDestPathsList)
+                mwvm.FileCnt_Target = fileList.Count();
+                mwvm.FileCnt_Checked = 0;
+                mwvm.PrgTitle = $"＜更新中＞{OrigPath}";
+
+                fileList.AsParallel().ForAll(file =>
                 {
-                    var updList = fileList.AsParallel().Select(file => new FileData(OrigPath, destPath_orig, file.FullName, true)).Where(x => x.IsNewFile || x.IsUpdatedFile).ToArray();
-                    mwvm.FileCnt_Target = updList.Length;
-                    mwvm.FileCnt_Checked = 0;
-                    mwvm.PrgTitle = $"＜更新中＞{OrigPath} -> {destPath_orig}";
-                    updList.AsParallel().ForAll(data =>
+                    token.ThrowIfCancellationRequested();
+                    try
                     {
-                        token.ThrowIfCancellationRequested();
-                        try
+                        mwvm.PrgTitle = $"＜更新中＞{file.FullName}";
+                        foreach (var destPath_orig in ExistDestPathsList)
                         {
+                            var data = new FileData(OrigPath, destPath_orig, file.FullName, true);
+                            if (!data.IsNewFile && !data.IsUpdatedFile) continue;
                             mwvm.PrgFileName = data.DestInfo.FullName;
                             if (data.TryDupricateFile(EncryptMode))
                             {
                                 if (data.IsUpdatedFile)
                                     FileCounter.AddUpdCnt();
-
                                 else if (data.IsNewFile)
                                     FileCounter.AddAddCnt();
                             }
                             else
                                 FileCounter.AddFailCnt();
                         }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{data.OrigInfo.FullName}");
-                        }
                         mwvm.FileCnt_Checked++;
-                    });
-                }
-                sw.Stop();
+                    }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.Print($"Exception: {e.GetType().Name}\r\n＞{file.FullName}");
+                    }
+                });
 
-                var time_upd = sw.Elapsed;
+                mwvm.FileCnt_Checked = 0;
+                resultTxts.Add($"ファイル更新：{sw.Elapsed}");
                 sw.Restart();
 
                 mwvm.PrgTitle = $"＜削除対象リストアップ中＞";
@@ -121,15 +124,14 @@ namespace FileMirroringTool.Models
                         dir: destPath,
                         files:
                             new DirectoryInfo(destPath).GetAllFileInfos("*", SearchOption.AllDirectories, SkipExclamation)
-                            .AsParallel()
                             .Select(file => new FileData(OrigPath, destPath, file.FullName, false))
-                            .Where(file => file.IsDeletedFile).ToArray()
+                            .Where(file => file.IsDeletedFile)
                     ));
 
-                var time_dellistup = sw.Elapsed;
+                resultTxts.Add($"削除ファイルリストアップ：{sw.Elapsed}");
                 sw.Restart();
 
-                mwvm.FileCnt_Target = delList.Sum(x => x.files.Length);
+                mwvm.FileCnt_Target = delList.Sum(x => x.files.Count());
                 foreach (var (dir, files) in delList)
                 {
                     mwvm.PrgTitle = $"＜削除中＞{dir}";
@@ -142,18 +144,17 @@ namespace FileMirroringTool.Models
                             FileCounter.AddDelCnt();
                     });
                 }
+
+                resultTxts.Add($"ファイル削除：{sw.Elapsed}");
+                sw.Restart();
                 mwvm.PrgTitle = $"＜空ディレクトリ削除中＞";
 
                 ExistDestPathsList.ForEach(x => FileUtils.DeleteEmptyDirs(x));
-                //ExistDestPathsList.SelectMany(dir => Directory.EnumerateDirectories(dir, "*", SearchOption.AllDirectories))
-                //    .OrderBy(x => x.Length).ToList().ForEach(dir => FileUtils.DeleteEmptyDirs(dir));
 
-                var time_del = sw.Elapsed;
-                Console.WriteLine($"処理にかかった時間\r\n" +
-                    $"updリストアップ：{time_updlistup}" +
-                    $"upd実行：{time_upd}" +
-                    $"delリストアップ：{time_dellistup}" +
-                    $"del実行：{time_del}");
+                resultTxts.Add($"空ディレクトリ削除：{sw.Elapsed}");
+                sw.Restart();
+                sw.Stop();
+                Console.WriteLine($"処理にかかった時間\r\n" + String.Join("\r\n", resultTxts));
             }
             catch (Exception e)
             {
