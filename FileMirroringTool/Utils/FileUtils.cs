@@ -20,7 +20,11 @@ namespace FileMirroringTool.Utils
                 {
                     DeleteEmptyDirs(d);
                 }
-
+                foreach(var thumbs in Directory.EnumerateFileSystemEntries(dir).Where(x => Path.GetFileName(x) == "Thumbs.db"))
+                {
+                    File.Delete(thumbs);
+                }
+                
                 var entries = Directory.EnumerateFileSystemEntries(dir);
 
                 if (!entries.Any())
